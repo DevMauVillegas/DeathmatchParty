@@ -19,31 +19,26 @@ class DEATHMATCHPARTY_API UCombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
 	
-	bool bCanFire = true;
+	bool bCanFire;
 	bool bFireButtonPressed;
-
-	float CrosshairVelocityFactor;
-	float CrosshairInAirFactor = 0.f;
 
 	// FOV when not aiming
 	float DefaultFOV;
 	float CurrentFOV;
-	float CrosshairAimFactor = 0.f;
-	float BaseSpread;
-	float CrosshairShootingFactor = 0.f;
 	
 	FHUDPackage HUDPackage;
 	FTimerHandle FireTimer;
+	
 	TMap<EWeaponType, int32> CarriedAmmoMap;
 
 	UPROPERTY(ReplicatedUsing=OnRep_CombatState)
-	ECombatState CombatState = ECombatState::ECS_Unoccupied;
+	ECombatState CombatState;
 	
 	UPROPERTY()
 	APartyCharacter* PartyCharacter;
 
 	UPROPERTY()
-	APartyPlayerController* PC;
+	APartyPlayerController* PartyPlayerController;
 
 	UPROPERTY()
 	APartyHUD* HUD;
@@ -51,60 +46,90 @@ class DEATHMATCHPARTY_API UCombatComponent : public UActorComponent
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* FollowCamera;
 	
-	UPROPERTY(ReplicatedUsing=OnRep_EquippedWeapon)
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
 
-	UPROPERTY(ReplicatedUsing=OnRep_BackupWeapon)
+	UPROPERTY(ReplicatedUsing = OnRep_BackupWeapon)
 	AWeapon* BackupWeapon;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_Aiming)
-	bool bAiming = false;
+	bool bAiming;
 
-	bool bAimButtonPressed = false;
+	bool bAimButtonPressed;
 
 	UFUNCTION()
 	void OnRep_Aiming();
-
-	UPROPERTY(EditAnywhere)
-	float BaseWalkSpeed;
-
-	bool bLocallyReloading = false;
+	
+	bool bLocallyReloading;
 
 	UPROPERTY(ReplicatedUsing=OnRep_HoldingTheFlag)
-	bool bHoldingFlag = false;
+	bool bHoldingFlag;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, Category="Movement")
+	float BaseWalkSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category="Movement")
 	float AimWalkSpeed;
 
-	UPROPERTY(EditAnywhere, Category=Combat)
-	float ZoomedFOV = 30.f;
+	UPROPERTY(EditAnywhere, Category="Combat")
+	float ZoomedFOV;
 	
-	UPROPERTY(EditAnywhere, Category=Combat)
-	float ZoomInterpSpeed = 20.f;
+	UPROPERTY(EditAnywhere, Category="Combat")
+	float ZoomInterpSpeed;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Crosshair")
+	float BaseSpread;
+
+	UPROPERTY(EditDefaultsOnly, Category="Crosshair")
+	float CrosshairInAirSpeed;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Crosshair")
+	float CrosshairInLandSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category="Crosshair")
+	float CrosshairAimSpeed;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Crosshair")
+	float CrosshairShootingSpeed;
+	
+	float CrosshairVelocityFactor;
+	float CrosshairAimFactor;
+	float CrosshairInAirFactor;
+	float CrosshairShootingFactor;
 
 	//
 	// AMMO
 	//
 	UPROPERTY(ReplicatedUsing=OnRep_CarriedAmmo)
 	int32 CarriedAmmo;
-	UPROPERTY(EditAnywhere)
-	int32 StartingRifleAmmo = 60;
-	UPROPERTY(EditAnywhere)
-	int32 StartingRocketAmmo = 5;
-	UPROPERTY(EditAnywhere)
-	int32 StartingPistolAmmo = 90;
-	UPROPERTY(EditAnywhere)
-	int32 StartingShotgunAmmo = 30;
-	UPROPERTY(EditAnywhere)
-	int32 StartingSniperAmmo = 5;
-	UPROPERTY(EditAnywhere)
-	int32 StartingGranadeAmmo = 15;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ammo", meta=(ClampMin="0"))
+	int32 StartingRifleAmmo;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ammo", meta=(ClampMin="0"))
+	int32 StartingRocketAmmo;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ammo", meta=(ClampMin="0"))
+	int32 StartingPistolAmmo;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ammo", meta=(ClampMin="0"))
+	int32 StartingShotgunAmmo;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ammo", meta=(ClampMin="0"))
+	int32 StartingSniperAmmo;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ammo", meta=(ClampMin="0"))
+	int32 StartingGranadeAmmo;
 	
 	void StartFireTimer();
 	void FireTimerFinished();
 	void InterpFOV(float DeltaTime);
 	bool CanFire();
 	void InitializeCarriedAmmo();
+
+	// Validates all needed variables were properly initialized with blueprints values
+	UFUNCTION()
+	void DefaultVariablesInitialization();
 	
 public:	
 	UCombatComponent();

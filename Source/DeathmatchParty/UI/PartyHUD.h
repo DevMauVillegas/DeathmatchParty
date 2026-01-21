@@ -16,13 +16,33 @@ struct FHUDPackage
 {
 	GENERATED_BODY()
 
+	FHUDPackage()
+	{
+		CrosshairSpread = 0.0f;
+		CrosshairColor = FLinearColor::Black;
+		CrosshairCenter = nullptr;
+		CrosshairTop = nullptr;
+		CrosshairBottom = nullptr;
+		CrosshairLeft = nullptr;
+		CrosshairRight = nullptr;
+	}
+
 	float CrosshairSpread;
 	FLinearColor CrosshairColor;
-	
+
+	UPROPERTY()
 	UTexture2D* CrosshairCenter;
+	
+	UPROPERTY()
 	UTexture2D* CrosshairTop;
+
+	UPROPERTY()
 	UTexture2D* CrosshairBottom;
+
+	UPROPERTY()
 	UTexture2D* CrosshairLeft;
+
+	UPROPERTY()
 	UTexture2D* CrosshairRight;
 };
 

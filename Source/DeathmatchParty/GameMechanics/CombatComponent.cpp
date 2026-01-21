@@ -12,20 +12,24 @@
 #include "Sound/SoundCue.h"
 #include "Weapons/Shotgun.h"
 
-UCombatComponent::UCombatComponent(): bFireButtonPressed(false), CrosshairVelocityFactor(0), DefaultFOV(0),
-                                      CurrentFOV(0), BaseSpread(0),
-                                      HUDPackage(),
-                                      PartyCharacter(nullptr), PC(nullptr),
-                                      HUD(nullptr),
-                                      FollowCamera(nullptr),
-                                      EquippedWeapon(nullptr),
-                                      BackupWeapon(nullptr),
-                                      CarriedAmmo(0)
+UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	BaseWalkSpeed = 550.f;
-	AimWalkSpeed = 375.f;
+	DefaultVariablesInitialization();
+	
+	// Variables setup
+
+	bCanFire = true;
+	bFireButtonPressed = false;
+
+	CombatState = ECombatState::ECS_Unoccupied;
+	
+	bAiming = false;
+	bAimButtonPressed = false;
+	
+	bLocallyReloading = false;
+	bHoldingFlag = false;
 }
 
 void UCombatComponent::BeginPlay()
@@ -282,14 +286,14 @@ void UCombatComponent::SetHUDCrosshair(float DeltaTime)
 		return;
 	}
 
-	PC = PC == nullptr ? Cast<APartyPlayerController>(PartyCharacter->Controller) : PC;
+	PartyPlayerController = PartyPlayerController == nullptr ? Cast<APartyPlayerController>(PartyCharacter->Controller) : PartyPlayerController;
 
-	if (PC == nullptr)
+	if (PartyPlayerController == nullptr)
 	{
 		return;
 	}
 	
-	HUD = HUD == nullptr ? Cast<APartyHUD>(PC->GetHUD()) : HUD;
+	HUD = HUD == nullptr ? Cast<APartyHUD>(PartyPlayerController->GetHUD()) : HUD;
 
 	if (HUD == nullptr)
 	{
@@ -325,30 +329,30 @@ void UCombatComponent::SetHUDCrosshair(float DeltaTime)
 	
 	if (PartyCharacter->GetCharacterMovement()->IsFalling())
 	{
-		CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 2.5f, DeltaTime, 2.5);
+		CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 2.5f, DeltaTime, CrosshairInAirSpeed);
 	}
 	else
 	{
-		CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.f, DeltaTime, 10.f);
+		CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.f, DeltaTime, CrosshairInLandSpeed);
 	}
 
 	if (bAiming)
 	{
-		CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, -0.5f, DeltaTime, 30.f);
+		CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, -0.5f, DeltaTime, CrosshairAimSpeed);
 	}
 	else
 	{
-		CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, 0.f, DeltaTime, 30.f);
+		CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, 0.f, DeltaTime, CrosshairAimSpeed);
 	}
 
-	CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.f, DeltaTime, 40.f);
+	CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.f, DeltaTime, CrosshairShootingSpeed);
 	
 	HUDPackage.CrosshairSpread =
-		EquippedWeapon ? EquippedWeapon->GetAimSpread() : 0.5f +
-			CrosshairShootingFactor +
-				CrosshairVelocityFactor +
-					CrosshairInAirFactor +
-						CrosshairAimFactor;
+		0.5f +
+		CrosshairShootingFactor +
+		CrosshairVelocityFactor +
+		CrosshairInAirFactor +
+		CrosshairAimFactor;
 	
 	HUD->SetHUFPackage(HUDPackage);
 	
@@ -504,9 +508,9 @@ int32 UCombatComponent::GetCurrentWeaponAmmo()
 
 void UCombatComponent::OnRep_CarriedAmmo()
 {
-	if (PC)
+	if (PartyPlayerController)
 	{
-		PC->SetHUDCarriedAmmo(CarriedAmmo);
+		PartyPlayerController->SetHUDCarriedAmmo(CarriedAmmo);
 	}
 }
 
@@ -547,8 +551,6 @@ void UCombatComponent::EquipWeapon(AWeapon* inWeapon)
 	if (inWeapon->GetWeaponType() == EWeaponType::EWT_Flag)
 	{
 		PartyCharacter->Crouch();
-		//PartyCharacter->GetCharacterMovement()->bOrientRotationToMovement = true;
-		//PartyCharacter->bUseControllerRotationYaw = false;
 		bHoldingFlag = true;
 		inWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 		AttachFlagToLeftHand(inWeapon);
@@ -616,9 +618,9 @@ void UCombatComponent::EquipPrimaryWeapon(AWeapon* inWeapon)
 		CarriedAmmo = CarriedAmmoMap[WeaponType];
 	}
 	
-	if (PC)
+	if (PartyPlayerController)
 	{
-		PC->SetHUDCarriedAmmo(CarriedAmmo);
+		PartyPlayerController->SetHUDCarriedAmmo(CarriedAmmo);
 	}
 
 	PlayEquipWeaponSound(EquippedWeapon);
@@ -756,10 +758,10 @@ void UCombatComponent::UpdateCarriedAmmo()
 	{
 		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
 	}
-	PC = PC == nullptr ? Cast<APartyPlayerController>(PartyCharacter->Controller) : PC;
-	if (PC)
+	PartyPlayerController = PartyPlayerController == nullptr ? Cast<APartyPlayerController>(PartyCharacter->Controller) : PartyPlayerController;
+	if (PartyPlayerController)
 	{
-		PC->SetHUDCarriedAmmo(CarriedAmmo);
+		PartyPlayerController->SetHUDCarriedAmmo(CarriedAmmo);
 	}
 }
 
@@ -779,9 +781,9 @@ void UCombatComponent::UpdateAmmoValues()
 		EquippedWeapon->AddAmmo(ReloadAmount);
 	}
 
-	if (PC)
+	if (PartyPlayerController)
 	{
-		PC->SetHUDCarriedAmmo(CarriedAmmo);
+		PartyPlayerController->SetHUDCarriedAmmo(CarriedAmmo);
 	}
 }
 
@@ -845,9 +847,9 @@ void UCombatComponent::FinishSwapAttach()
 		CarriedAmmo = CarriedAmmoMap[WeaponType];
 	}
 	
-	if (PC)
+	if (PartyPlayerController)
 	{
-		PC->SetHUDCarriedAmmo(CarriedAmmo);
+		PartyPlayerController->SetHUDCarriedAmmo(CarriedAmmo);
 	}
 
 	PlayEquipWeaponSound(EquippedWeapon);
@@ -855,4 +857,26 @@ void UCombatComponent::FinishSwapAttach()
 	BackupWeapon->SetWeaponState(EWeaponState::EWS_Backup);
 	
 	AttachBackupWeapon(BackupWeapon);
+}
+
+void UCombatComponent::DefaultVariablesInitialization()
+{
+	// This values are intended to be edited and overriden in the Blueprint settings
+
+	CarriedAmmo = 0.0f;
+	
+	StartingRifleAmmo = 60;
+	StartingRocketAmmo = 5;
+	StartingPistolAmmo = 90;
+	StartingShotgunAmmo = 30;
+	StartingSniperAmmo = 15;
+	StartingGranadeAmmo = 10;
+
+	ZoomedFOV = 30.0f;
+	ZoomInterpSpeed = 20.f;
+
+	CrosshairAimSpeed = 30.0f;
+	CrosshairShootingSpeed = 40.0f;
+	CrosshairInAirSpeed = 2.5f;
+	CrosshairInLandSpeed = 10.0f;
 }
