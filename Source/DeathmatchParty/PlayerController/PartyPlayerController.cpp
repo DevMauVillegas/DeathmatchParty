@@ -426,6 +426,8 @@ void APartyPlayerController::SetHUDWeaponAmmo(int32 WeaponAmmoAmount)
 	{
 		const FString AmmoText = FString::Printf(TEXT("%02d"), WeaponAmmoAmount);
 		PartyHUD->CharacterOverlay->WeaponAmmo->SetText(FText::FromString(AmmoText));
+
+		bInitializeWeaponAmmo = false;
 	}
 	else
 	{
@@ -444,6 +446,8 @@ void APartyPlayerController::SetHUDCarriedAmmo(int32 CarriedAmmoAmount)
 	{
 		const FString AmmoText = FString::Printf(TEXT("%d"), CarriedAmmoAmount);
 		PartyHUD->CharacterOverlay->TotalAmmo->SetText(FText::FromString(AmmoText));
+
+		bInitializeCarriedAmmo = false;
 	}
 	else
 	{
@@ -565,12 +569,13 @@ void APartyPlayerController::PollInit()
 	{
 		if (bInitializeCarriedAmmo)
 		{
-			SetHUDCarriedAmmo(HUDCarriedAmmo);
+			//SetHUDCarriedAmmo(HUDCarriedAmmo);
 		}
 		
 		if (bInitializeWeaponAmmo)
 		{
-			SetHUDWeaponAmmo(HUDWeaponAmmo);
+			
+			//SetHUDWeaponAmmo(HUDWeaponAmmo);
 		}
 	}
 		

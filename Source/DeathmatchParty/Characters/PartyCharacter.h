@@ -11,14 +11,14 @@
 #include "PartyTypes/CombatState.h"
 #include "PartyCharacter.generated.h"
 
-class UAttributeSet;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
+
 class UGameplayEffect;
 class UPartyAttributeSet;
 class UAbilitySystemComponent;
 class APartyGameMode;
 class UNiagaraSystem;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
-
 class APartyPlayerState;
 class UCombatComponent;
 class UBuffComponent;
@@ -29,7 +29,6 @@ class AWeapon;
 class UAnimMontage;
 class APartyPlayerController;
 class AController;
-class UOverheadWidget;
 class UBoxComponent;
 class ULagCompensationComponent;
 class UNiagaraComponent;
@@ -39,6 +38,7 @@ class DEATHMATCHPARTY_API APartyCharacter : public ACharacter, public IInteractW
 {
 	GENERATED_BODY()
 
+	virtual void PossessedBy(AController* NewController) override;
 	
 	/**
 	 * Character Elements and subobjects
@@ -62,7 +62,6 @@ class DEATHMATCHPARTY_API APartyCharacter : public ACharacter, public IInteractW
 	/**
 	 * End of character elements and subobjects
 	 */
-
 	
 	FString PlayerName;
 	bool bIsAiming;
@@ -72,7 +71,6 @@ class DEATHMATCHPARTY_API APartyCharacter : public ACharacter, public IInteractW
 	float AO_Pitch;
 	float InterpAO_Yaw;
 	float ProxiYaw;
-	float TurnThreshold = 3.f;
 	float TimeSinceLastMovementReplication;
 	
 	FRotator StartingAimRotation;
@@ -80,6 +78,9 @@ class DEATHMATCHPARTY_API APartyCharacter : public ACharacter, public IInteractW
 	FRotator ProxiRotation;
 
 	ETurningInPlace TurningInPlace;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float TurnThreshold;
 
 	UPROPERTY(EditAnywhere)
 	UCurveFloat* DissolveCurve;
@@ -90,7 +91,7 @@ class DEATHMATCHPARTY_API APartyCharacter : public ACharacter, public IInteractW
 	FOnTimelineFloat DissolveTrack;
 
 	UPROPERTY()
-	APartyPlayerController* PartyPlayerController;
+	APartyPlayerController* CachedPartyPlayerController;
 	
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold = 200.f;
@@ -233,19 +234,19 @@ public:
 	void SetTeamColor(ETeam TeamSelected);
 
 	UPROPERTY(EditAnywhere, Category=Elim)
-	UMaterialInstance* OriginalMaterialInstance;
+	TSoftObjectPtr<UMaterialInstance> OriginalMaterialInstance;
 	
 	UPROPERTY(EditAnywhere, Category=Elim)
-	UMaterialInstance* RedMaterialInstance;
+	TSoftObjectPtr<UMaterialInstance> RedMaterialInstance;
 	
 	UPROPERTY(EditAnywhere, Category=Elim)
-	UMaterialInstance* RedDissolveMaterialInstance;
+	TSoftObjectPtr<UMaterialInstance> RedDissolveMaterialInstance;
 
 	UPROPERTY(EditAnywhere, Category=Elim)
-	UMaterialInstance* BlueMaterialInstance;
+	TSoftObjectPtr<UMaterialInstance> BlueMaterialInstance;
 	
 	UPROPERTY(EditAnywhere, Category=Elim)
-	UMaterialInstance* BlueDissolveMaterialInstance;
+	TSoftObjectPtr<UMaterialInstance> BlueDissolveMaterialInstance;
 	
 	/**
 	 * Elimination and exit region
@@ -275,9 +276,9 @@ public:
 	UAnimMontage* EliminatedMontage;
 
 	UPROPERTY(EditDefaultsOnly)
-	float ElimDelay = 3.f;
+	float ElimDelay;
 	
-	bool bLeftGame = false;
+	bool bLeftGame;
 
 	bool bIsEliminated;
 	FTimerHandle EliminatedTimer;
@@ -297,7 +298,7 @@ public:
 #pragma region CrownEffect
 
 	UPROPERTY(EditAnywhere)
-	UNiagaraSystem* CrownSystem;
+	TSoftObjectPtr<UNiagaraSystem> CrownSystem;
 
 	UPROPERTY()
 	UNiagaraComponent* CrownComponent;

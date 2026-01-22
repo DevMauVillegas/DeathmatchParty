@@ -69,14 +69,15 @@ APartyCharacter::APartyCharacter()
 	NetUpdateFrequency = 56.f;
 	MinNetUpdateFrequency = 33.f;
 
+	TurnThreshold = 3.0f;
+
+	ElimDelay = 3.0f;
+	
+	bLeftGame = false;
+
 	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DIssolveTimelineComponent"));
 
 	SetupCollisionBoxes();
-}
-
-UAbilitySystemComponent* APartyCharacter::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent;
 }
 
 void APartyCharacter::BeginPlay()
@@ -86,14 +87,8 @@ void APartyCharacter::BeginPlay()
 	if (IsValid(AbilitySystemComponent))
 	{
 		AttributeSet = AbilitySystemComponent->GetSet<UPartyAttributeSet>();
-	}
-	
-	if (AbilitySystemComponent)
-	{
 		BindAttributeChangeDelegates();
 	}
-
-	PartyPlayerController =  Cast<APartyPlayerController>(Controller);
 
 	if (HasAuthority())
 	{
@@ -101,10 +96,6 @@ void APartyCharacter::BeginPlay()
 	}
 
 	SpawnDefaultWeapon();
-	UpdateHUDAmmo();
-
-	UpdateHUDHealth();
-	UpdateHUDShield();
 }
 
 void APartyCharacter::Tick(const float DeltaTime)
@@ -114,6 +105,11 @@ void APartyCharacter::Tick(const float DeltaTime)
 	
 	PollInit();
 	RotateInPlace(DeltaTime);
+}
+
+UAbilitySystemComponent* APartyCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }
 
 void APartyCharacter::SpawnDefaultWeapon()
@@ -317,7 +313,7 @@ void APartyCharacter::MulticastGainTheLead_Implementation()
 	if (CrownComponent == nullptr)
 	{
 		CrownComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			CrownSystem,
+			CrownSystem.LoadSynchronous(),
 			GetMesh(),
 			FName(),
 			GetActorLocation() + FVector(0.0f, 0.0f, 110.0f),
@@ -374,29 +370,29 @@ void APartyCharacter::SetSpawnPoint()
 
 void APartyCharacter::UpdateHUDHealth()
 {
-	PartyPlayerController = PartyPlayerController == nullptr ? Cast<APartyPlayerController>(Controller) : PartyPlayerController;
-	if (PartyPlayerController && AttributeSet)
+	CachedPartyPlayerController = CachedPartyPlayerController == nullptr ? Cast<APartyPlayerController>(Controller) : CachedPartyPlayerController;
+	if (CachedPartyPlayerController && AttributeSet)
 	{
-		PartyPlayerController->SetHUDHealth(AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
+		CachedPartyPlayerController->SetHUDHealth(AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
 	}
 }
 
 void APartyCharacter::UpdateHUDShield()
 {
-	PartyPlayerController = PartyPlayerController == nullptr ? Cast<APartyPlayerController>(Controller) : PartyPlayerController;
-	if (PartyPlayerController && AttributeSet)
+	CachedPartyPlayerController = CachedPartyPlayerController == nullptr ? Cast<APartyPlayerController>(Controller) : CachedPartyPlayerController;
+	if (CachedPartyPlayerController && AttributeSet)
 	{
-		PartyPlayerController->SetHUDShield(AttributeSet->GetShield(), AttributeSet->GetMaxShield());
+		CachedPartyPlayerController->SetHUDShield(AttributeSet->GetShield(), AttributeSet->GetMaxShield());
 	}
 }
 
 void APartyCharacter::UpdateHUDAmmo()
 {
-	PartyPlayerController = PartyPlayerController == nullptr ? Cast<APartyPlayerController>(Controller) : PartyPlayerController;
-	if (PartyPlayerController && CombatComponent && CombatComponent->EquippedWeapon)
+	CachedPartyPlayerController = CachedPartyPlayerController == nullptr ? Cast<APartyPlayerController>(Controller) : CachedPartyPlayerController;
+	if (CachedPartyPlayerController && CombatComponent && CombatComponent->EquippedWeapon)
 	{
-		PartyPlayerController->SetHUDCarriedAmmo(CombatComponent->CarriedAmmo);
-		PartyPlayerController->SetHUDWeaponAmmo(CombatComponent->EquippedWeapon->GetAmmo());
+		CachedPartyPlayerController->SetHUDCarriedAmmo(CombatComponent->CarriedAmmo);
+		CachedPartyPlayerController->SetHUDWeaponAmmo(CombatComponent->EquippedWeapon->GetAmmo());
 	}
 }
 
@@ -563,22 +559,22 @@ void APartyCharacter::SetTeamColor(ETeam TeamSelected)
 	case ETeam::ET_NoTeam:
 		if (OriginalMaterialInstance != nullptr)
 		{
-			GetMesh()->SetMaterial(0, OriginalMaterialInstance);
-			DissolvedMaterialInstance = BlueDissolveMaterialInstance;
+			GetMesh()->SetMaterial(0, OriginalMaterialInstance.LoadSynchronous());
+			DissolvedMaterialInstance = BlueDissolveMaterialInstance.Get();
 		}
 		break;
 	case ETeam::ET_BlueTeam:
 		if (BlueMaterialInstance != nullptr)
 		{
-			GetMesh()->SetMaterial(0, BlueMaterialInstance);
-			DissolvedMaterialInstance = BlueDissolveMaterialInstance;
+			GetMesh()->SetMaterial(0, BlueMaterialInstance.LoadSynchronous());
+			DissolvedMaterialInstance = BlueDissolveMaterialInstance.LoadSynchronous();
 		}
 		break;
 	case ETeam::ET_RedTeam:
 		if (RedMaterialInstance != nullptr)
 		{
-			GetMesh()->SetMaterial(0, RedMaterialInstance);
-			DissolvedMaterialInstance = RedDissolveMaterialInstance;
+			GetMesh()->SetMaterial(0, RedMaterialInstance.LoadSynchronous());
+			DissolvedMaterialInstance = RedDissolveMaterialInstance.LoadSynchronous();
 		}
 		break;
 	default:
@@ -601,6 +597,14 @@ void APartyCharacter::ServerLeaveGame_Implementation()
 		PartyPlayerState = PartyPlayerState == nullptr ? GetPlayerState<APartyPlayerState>() : PartyPlayerState;
 		PartyGameMode->PlayerLeftGame(PartyPlayerState);
 	}
+}
+
+void APartyCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	CachedPartyPlayerController =  Cast<APartyPlayerController>(NewController);
+	UpdateHUDAmmo();
 }
 
 void APartyCharacter::TurnInPlace(float DeltaTime)
@@ -680,7 +684,7 @@ void APartyCharacter::EliminatedTimerFinished()
 	PartyGameMode = PartyGameMode == nullptr ? GetWorld()->GetAuthGameMode<APartyGameMode>() : PartyGameMode;
 	if (PartyGameMode)
 	{
-		PartyGameMode->RequestRespawn(this, PartyPlayerController);
+		PartyGameMode->RequestRespawn(this, CachedPartyPlayerController);
 	}
 }
 
@@ -694,10 +698,10 @@ void APartyCharacter::MulticastEliminated_Implementation(bool bPlayerLeftGame)
 	GetCharacterMovement()->DisableMovement();
 	GetCharacterMovement()->StopMovementImmediately();
 
-	if (PartyPlayerController)
+	if (CachedPartyPlayerController)
 	{
 		bDisabledGameplay = true;
-		PartyPlayerController->SetHUDWeaponAmmo(0);
+		CachedPartyPlayerController->SetHUDWeaponAmmo(0);
 	}
 
 	if (CombatComponent)
@@ -1090,7 +1094,6 @@ void APartyCharacter::PollInit()
 			}
 		}
 	}
-
 }
 
 bool APartyCharacter::IsHoldingTheFlag() const
@@ -1182,7 +1185,7 @@ void APartyCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UD
 			if (PartyGameMode)
 			{
 				APartyPlayerController* AttackerController = Cast<APartyPlayerController>(InstigatorController);
-				PartyGameMode->PlayerEliminated(this, PartyPlayerController, AttackerController);
+				PartyGameMode->PlayerEliminated(this, CachedPartyPlayerController, AttackerController);
 			}
 		}
 	}
