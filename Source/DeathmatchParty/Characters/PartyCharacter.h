@@ -40,6 +40,8 @@ class DEATHMATCHPARTY_API APartyCharacter : public ACharacter, public IInteractW
 
 	virtual void PossessedBy(AController* NewController) override;
 	
+	virtual void OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState) override;
+	
 	/**
 	 * Character Elements and subobjects
 	 */
@@ -356,9 +358,9 @@ public:
 	FORCEINLINE ULagCompensationComponent* GetLagCompensationComponent() const { return LagCompensationComponent; }
 	FORCEINLINE const UPartyAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
-	void SetHoldingTheFlag(bool bIsHolding);
-	void ApplyHealthDamageEffect(float DamageToHealth);
-	void ApplyShieldDamageEffect(float DamageToShield);
+	void SetHoldingTheFlag(bool bIsHolding) const;
+	void ApplyHealthDamageEffect(float DamageToHealth) const;
+	void ApplyShieldDamageEffect(float DamageToShield) const;
 
 	UFUNCTION()
 	virtual void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser);
@@ -379,10 +381,10 @@ protected:
 	void MoveCameraY(float Value);
 	void EquipButtonPressed();
 	void CrouchButtonPressed();
-	void AimButtonPressed() ;
-	void FireButtonPressed() ;
-	void FireButtonReleased() ;
-	void ReloadButtonPressed() ;
+	void AimButtonPressed();
+	void FireButtonPressed();
+	void FireButtonReleased();
+	void ReloadButtonPressed();
 	void CalculateAO_Pitch();
 	float CalculateSpeed() const;
 
@@ -393,5 +395,4 @@ protected:
 	void AimOffset(float DeltaTime);
 
 	void SimProxisTurn();
-	void PollInit();
 };

@@ -17,7 +17,7 @@
 #include "UI/WarmupAnnouncement.h"
 
 
-void APartyPlayerController::OnRep_ShowTeamScores()
+void APartyPlayerController::OnRep_ShowTeamScores() const
 {
 	if (bShowTeamScores)
 	{
@@ -43,7 +43,6 @@ void APartyPlayerController::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	SetHUDTime();
-	PollInit();
 	CheckTimeSync(DeltaSeconds);
 
 	HighPingRunningTime += DeltaSeconds;
@@ -51,8 +50,6 @@ void APartyPlayerController::Tick(float DeltaSeconds)
 	{
 		CheckPing();
 	}
-
-	
 }
 
 void APartyPlayerController::OnPossess(APawn* InPawn)
@@ -125,64 +122,54 @@ void APartyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 // HUD MODIFICATIONS
 //
 
-void APartyPlayerController::StartConnectionWarning()
+void APartyPlayerController::StartConnectionWarning() const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD == nullptr)
 	{
 		return;
 	}
 
-	CharacterOverlay = CharacterOverlay == nullptr ? PartyHUD->CharacterOverlay : CharacterOverlay;
-	if (CharacterOverlay)
+	if (UCharacterOverlay* CharacterOverlay = PartyHUD->CharacterOverlay)
 	{
 		CharacterOverlay->PlayConnectionWarningAnimation();
 	}
 }
 
-void APartyPlayerController::StopConnectionWarning()
+void APartyPlayerController::StopConnectionWarning() const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD == nullptr)
 	{
 		return;
 	}
 	
-	CharacterOverlay = CharacterOverlay == nullptr ? PartyHUD->CharacterOverlay : CharacterOverlay;
-	if (CharacterOverlay)
+	if (UCharacterOverlay* CharacterOverlay = PartyHUD->CharacterOverlay)
 	{
 		CharacterOverlay->StopConnectionWarningAnimation();
 	}
 }
 
-void APartyPlayerController::HideTeamUIElements()
+void APartyPlayerController::HideTeamUIElements() const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD == nullptr)
 	{
 		return;
 	}
 
-	CharacterOverlay = CharacterOverlay == nullptr ? PartyHUD->CharacterOverlay : CharacterOverlay;
+	const UCharacterOverlay* CharacterOverlay = PartyHUD->CharacterOverlay;
 	if (CharacterOverlay && CharacterOverlay->TeamHorizontalBox)
 	{
 		CharacterOverlay->TeamHorizontalBox->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 
-void APartyPlayerController::InitTeamScores()
+void APartyPlayerController::InitTeamScores() const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD == nullptr)
 	{
 		return;
 	}
 
-	CharacterOverlay = CharacterOverlay == nullptr ? PartyHUD->CharacterOverlay : CharacterOverlay;
+	const UCharacterOverlay* CharacterOverlay = PartyHUD->CharacterOverlay;
 	if (CharacterOverlay && CharacterOverlay->RedTeamScore && CharacterOverlay->BlueTeamScore)
 	{
 		FString ScoreText = FString::Printf(TEXT("%d"), 0);
@@ -191,16 +178,14 @@ void APartyPlayerController::InitTeamScores()
 	}
 }
 
-void APartyPlayerController::SetHUDRedTeamScore(int32 RedScore)
+void APartyPlayerController::SetHUDRedTeamScore(int32 RedScore) const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD == nullptr)
 	{
 		return;
 	}
 
-	CharacterOverlay = CharacterOverlay == nullptr ? PartyHUD->CharacterOverlay : CharacterOverlay;
+	const UCharacterOverlay* CharacterOverlay = PartyHUD->CharacterOverlay;
 	if (CharacterOverlay && CharacterOverlay->RedTeamScore)
 	{
 		FString ScoreText = FString::Printf(TEXT("%d"), RedScore);
@@ -208,16 +193,14 @@ void APartyPlayerController::SetHUDRedTeamScore(int32 RedScore)
 	}
 }
 
-void APartyPlayerController::SetHUDBlueTeamScore(int32 BlueScore)
+void APartyPlayerController::SetHUDBlueTeamScore(int32 BlueScore) const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD == nullptr)
 	{
 		return;
 	}
 
-	CharacterOverlay = CharacterOverlay == nullptr ? PartyHUD->CharacterOverlay : CharacterOverlay;
+	const UCharacterOverlay* CharacterOverlay = PartyHUD->CharacterOverlay;
 	if (CharacterOverlay && CharacterOverlay->BlueTeamScore)
 	{
 		FString ScoreText = FString::Printf(TEXT("%d"), BlueScore);
@@ -238,9 +221,7 @@ void APartyPlayerController::ClientElimAnnouncement_Implementation(APlayerState*
 	{
 		return;
 	}
-
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
+	
 	if (PartyHUD)
 	{
 		FString AttackerString;
@@ -358,10 +339,8 @@ void APartyPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Quit", IE_Pressed, this, &APartyPlayerController::DisplayReturnToMainMenuScreen);
 }
 
-void APartyPlayerController::SetHUDHealth(float Health, float MaxHealth)
+void APartyPlayerController::SetHUDHealth(float Health, float MaxHealth) const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD &&
 		PartyHUD->CharacterOverlay &&
 		PartyHUD->CharacterOverlay->HealthBar &&
@@ -374,10 +353,8 @@ void APartyPlayerController::SetHUDHealth(float Health, float MaxHealth)
 	}
 }
 
-void APartyPlayerController::SetHUDShield(float Shield, float MaxShield)
+void APartyPlayerController::SetHUDShield(float Shield, float MaxShield) const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD &&
 		PartyHUD->CharacterOverlay &&
 		PartyHUD->CharacterOverlay->ShieldBar &&
@@ -390,10 +367,8 @@ void APartyPlayerController::SetHUDShield(float Shield, float MaxShield)
 	}
 }
 
-void APartyPlayerController::SetHUDScore(int32 Score)
+void APartyPlayerController::SetHUDScore(int32 Score) const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD &&
 		PartyHUD->CharacterOverlay &&
 		PartyHUD->CharacterOverlay->Score)
@@ -403,10 +378,8 @@ void APartyPlayerController::SetHUDScore(int32 Score)
 	}
 }
 
-void APartyPlayerController::SetHUDDefeats(int32 DefeatsAmount)
+void APartyPlayerController::SetHUDDefeats(int32 DefeatsAmount) const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD &&
 		PartyHUD->CharacterOverlay &&
 		PartyHUD->CharacterOverlay->Defeat)
@@ -418,8 +391,6 @@ void APartyPlayerController::SetHUDDefeats(int32 DefeatsAmount)
 
 void APartyPlayerController::SetHUDWeaponAmmo(int32 WeaponAmmoAmount)
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD &&
 		PartyHUD->CharacterOverlay &&
 		PartyHUD->CharacterOverlay->WeaponAmmo)
@@ -438,8 +409,6 @@ void APartyPlayerController::SetHUDWeaponAmmo(int32 WeaponAmmoAmount)
 
 void APartyPlayerController::SetHUDCarriedAmmo(int32 CarriedAmmoAmount)
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD &&
 		PartyHUD->CharacterOverlay &&
 		PartyHUD->CharacterOverlay->TotalAmmo)
@@ -456,10 +425,8 @@ void APartyPlayerController::SetHUDCarriedAmmo(int32 CarriedAmmoAmount)
 	}
 }
 
-void APartyPlayerController::SetHUDTimerCountdown(float CountdownTimer)
+void APartyPlayerController::SetHUDTimerCountdown(float CountdownTimer) const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD &&
 		PartyHUD->CharacterOverlay &&
 		PartyHUD->CharacterOverlay->TimerCountdown)
@@ -478,10 +445,8 @@ void APartyPlayerController::SetHUDTimerCountdown(float CountdownTimer)
 	}
 }
 
-void APartyPlayerController::SetHUDAnnouncementCountdown(float CountdownTime)
+void APartyPlayerController::SetHUDAnnouncementCountdown(float CountdownTime) const
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-	
 	if (PartyHUD &&
 		PartyHUD->WarmupWidget &&
 		PartyHUD->WarmupWidget->WarmupCountdown)
@@ -507,8 +472,6 @@ void APartyPlayerController::HandleMatchHasStarted(bool bTeamsMatch/* = false*/)
 		bShowTeamScores = bTeamsMatch;
 	}
 	
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD)
 	{
 		PartyHUD->AddCharacterOverlay();
@@ -555,33 +518,6 @@ void APartyPlayerController::OnRep_MatchState()
 	}
 }
 
-void APartyPlayerController::PollInit()
-{
-	if (CharacterOverlay == nullptr)
-	{
-		if (PartyHUD && PartyHUD->CharacterOverlay)
-		{
-			CharacterOverlay = PartyHUD->CharacterOverlay;
-		}
-	}
-	
-	if (CharacterOverlay != nullptr)
-	{
-		if (bInitializeCarriedAmmo)
-		{
-			//SetHUDCarriedAmmo(HUDCarriedAmmo);
-		}
-		
-		if (bInitializeWeaponAmmo)
-		{
-			
-			//SetHUDWeaponAmmo(HUDWeaponAmmo);
-		}
-	}
-		
-	
-}
-
 void APartyPlayerController::CheckPing()
 {
 	HighPingRunningTime = 0;
@@ -600,8 +536,6 @@ void APartyPlayerController::CheckPing()
 
 void APartyPlayerController::HandleCooldown()
 {
-	PartyHUD = PartyHUD == nullptr ? Cast<APartyHUD>(GetHUD()) : PartyHUD;
-
 	if (PartyHUD)
 	{
 		PartyHUD->CharacterOverlay->RemoveFromParent();
@@ -615,8 +549,8 @@ void APartyPlayerController::HandleCooldown()
 			if (PGS)
 			{
 				TArray<APartyPlayerState*> TopPlayers = PGS->TopScoringPlayers;
-				
-				FString MVPText = bShowTeamScores ? GetTeamInfoText(PGS) : GetInfoText(TopPlayers);
+
+				const FString MVPText = bShowTeamScores ? GetTeamInfoText(PGS) : GetInfoText(TopPlayers);
 
 				PartyHUD->WarmupWidget->ScoreAnnouncement->SetText(FText::FromString(MVPText));
 			}

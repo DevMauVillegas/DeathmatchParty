@@ -84,6 +84,8 @@ void APartyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PartyGameMode = GetWorld()->GetAuthGameMode<APartyGameMode>();
+	
 	if (IsValid(AbilitySystemComponent))
 	{
 		AttributeSet = AbilitySystemComponent->GetSet<UPartyAttributeSet>();
@@ -103,7 +105,6 @@ void APartyCharacter::Tick(const float DeltaTime)
 	Super::Tick(DeltaTime);
 	HideCharacterIfCharacterClose();
 	
-	PollInit();
 	RotateInPlace(DeltaTime);
 }
 
@@ -114,7 +115,6 @@ UAbilitySystemComponent* APartyCharacter::GetAbilitySystemComponent() const
 
 void APartyCharacter::SpawnDefaultWeapon()
 {
-	PartyGameMode = PartyGameMode == nullptr ? GetWorld()->GetAuthGameMode<APartyGameMode>() : PartyGameMode;
 	if (UWorld* World = GetWorld(); PartyGameMode && World && !bIsEliminated && DefaultWeapon)
 	{
 		AWeapon* StartingWeapon = World->SpawnActor<AWeapon>(DefaultWeapon);
@@ -591,7 +591,6 @@ void APartyCharacter::Eliminated(bool bPlayerLeftGame)
 
 void APartyCharacter::ServerLeaveGame_Implementation()
 {
-	PartyGameMode = PartyGameMode == nullptr ? GetWorld()->GetAuthGameMode<APartyGameMode>() : PartyGameMode;
 	if (PartyGameMode)
 	{
 		PartyPlayerState = PartyPlayerState == nullptr ? GetPlayerState<APartyPlayerState>() : PartyPlayerState;
@@ -605,6 +604,28 @@ void APartyCharacter::PossessedBy(AController* NewController)
 
 	CachedPartyPlayerController =  Cast<APartyPlayerController>(NewController);
 	UpdateHUDAmmo();
+}
+
+void APartyCharacter::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState)
+{
+	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
+	
+	PartyPlayerState = GetPlayerState<APartyPlayerState>();
+	if (PartyPlayerState)
+	{
+		PartyPlayerState->AddToScore(0);
+		PartyPlayerState->AddToDefeats(0);
+		SetTeamColor(PartyPlayerState->GetPlayerTeam());
+		SetSpawnPoint();
+	}
+
+	if (const APartyGameState* PartyGameState = Cast<APartyGameState>(UGameplayStatics::GetGameState(this)))
+	{
+		if (PartyGameState->TopScoringPlayers.Contains(PartyPlayerState))
+		{
+			MulticastGainTheLead();
+		}
+	}
 }
 
 void APartyCharacter::TurnInPlace(float DeltaTime)
@@ -681,7 +702,6 @@ void APartyCharacter::EliminatedTimerFinished()
 		return;	
 	}
 
-	PartyGameMode = PartyGameMode == nullptr ? GetWorld()->GetAuthGameMode<APartyGameMode>() : PartyGameMode;
 	if (PartyGameMode)
 	{
 		PartyGameMode->RequestRespawn(this, CachedPartyPlayerController);
@@ -894,7 +914,7 @@ void APartyCharacter::CrouchButtonPressed()
 	}
 }
 
-void APartyCharacter::AimButtonPressed() 
+void APartyCharacter::AimButtonPressed()
 {
 	if (!CombatComponent || bDisabledGameplay)
 	{
@@ -1002,7 +1022,6 @@ void APartyCharacter::Destroyed()
 {
 	Super::Destroyed();
 
-	PartyGameMode = PartyGameMode == nullptr ? GetWorld()->GetAuthGameMode<APartyGameMode>() : PartyGameMode;
 	const bool bMatchNotInProgress = PartyGameMode && PartyGameMode->GetMatchState() != MatchState::InProgress;
 	
 	if (CombatComponent && CombatComponent->EquippedWeapon && bMatchNotInProgress)
@@ -1073,29 +1092,6 @@ void APartyCharacter::SimProxisTurn()
 	}
 }
 
-void APartyCharacter::PollInit()
-{
-	if (PartyPlayerState == nullptr)
-	{
-		PartyPlayerState = GetPlayerState<APartyPlayerState>();
-		if (PartyPlayerState)
-		{
-			PartyPlayerState->AddToScore(0);
-			PartyPlayerState->AddToDefeats(0);
-			SetTeamColor(PartyPlayerState->GetPlayerTeam());
-			SetSpawnPoint();
-		}
-
-		if (const APartyGameState* PartyGameState = Cast<APartyGameState>(UGameplayStatics::GetGameState(this)))
-		{
-			if (PartyGameState->TopScoringPlayers.Contains(PartyPlayerState))
-			{
-				MulticastGainTheLead();
-			}
-		}
-	}
-}
-
 bool APartyCharacter::IsHoldingTheFlag() const
 {
 	if (CombatComponent == nullptr)
@@ -1106,7 +1102,7 @@ bool APartyCharacter::IsHoldingTheFlag() const
 	return CombatComponent->bHoldingFlag;
 }
 
-void APartyCharacter::SetHoldingTheFlag(bool bIsHolding)
+void APartyCharacter::SetHoldingTheFlag(bool bIsHolding) const
 {
 	if (CombatComponent == nullptr)
 	{
@@ -1116,7 +1112,7 @@ void APartyCharacter::SetHoldingTheFlag(bool bIsHolding)
 	CombatComponent->bHoldingFlag = bIsHolding;
 }
 
-void APartyCharacter::ApplyHealthDamageEffect(const float DamageToHealth)
+void APartyCharacter::ApplyHealthDamageEffect(const float DamageToHealth) const
 {
 	if (IsValid(DamageEffect))
 	{
@@ -1133,7 +1129,7 @@ void APartyCharacter::ApplyHealthDamageEffect(const float DamageToHealth)
 	}
 }
 
-void APartyCharacter::ApplyShieldDamageEffect(const float DamageToShield)
+void APartyCharacter::ApplyShieldDamageEffect(const float DamageToShield) const
 {
 	if (IsValid(DamageEffect))
 	{
@@ -1153,8 +1149,6 @@ void APartyCharacter::ApplyShieldDamageEffect(const float DamageToShield)
 void APartyCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                     AController* InstigatorController, AActor* DamageCauser)
 {
-	PartyGameMode = PartyGameMode == nullptr ? GetWorld()->GetAuthGameMode<APartyGameMode>() : PartyGameMode;
-
 	if (PartyGameMode == nullptr)
 	{
 		return;
@@ -1179,7 +1173,6 @@ void APartyCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UD
 	}
 	else
 	{
-		//PartyPlayerController = PartyPlayerController == nullptr ? Cast<APlayerController>(Controller) : PartyPlayerController;
 		if (Controller)
 		{
 			if (PartyGameMode)

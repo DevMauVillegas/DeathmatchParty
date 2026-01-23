@@ -41,9 +41,6 @@ class DEATHMATCHPARTY_API APartyPlayerController : public APlayerController
 
 	float HUDWeaponAmmo;
 	bool bInitializeWeaponAmmo = true;
-
-	UPROPERTY()
-	UCharacterOverlay* CharacterOverlay;
 	
 	UPROPERTY()
 	APartyHUD* PartyHUD;
@@ -79,23 +76,22 @@ class DEATHMATCHPARTY_API APartyPlayerController : public APlayerController
 	UFUNCTION()
 	void OnRep_MatchState();
 
-	void PollInit();
 	void CheckPing();
 
 public:
 
 	float SingleTripTime = 0.0f;
 	
-	void SetHUDHealth(float Health, float MaxHealth);
-	void SetHUDShield(float Shield, float MaxShield);
-	void SetHUDScore(int32 ScoreAmount);
-	void SetHUDDefeats(int32 DefeatsAmount);
+	void SetHUDHealth(float Health, float MaxHealth) const;
+	void SetHUDShield(float Shield, float MaxShield) const;
+	void SetHUDScore(int32 ScoreAmount) const;
+	void SetHUDDefeats(int32 DefeatsAmount) const;
 	void SetHUDWeaponAmmo(int32 WeaponAmmoAmount);
 	void SetHUDCarriedAmmo(int32 CarriedAmmoAmount);
-	void SetHUDTimerCountdown(float CountdownTimer);
+	void SetHUDTimerCountdown(float CountdownTimer) const;
 	void HandleMatchHasStarted(bool bTeamsMatch = false);
 	void OnMatchStateSet(FName State, bool bTeamsMatch = false);
-	void SetHUDAnnouncementCountdown(float CountdownTime);
+	void SetHUDAnnouncementCountdown(float CountdownTime) const;
 	void HandleCooldown();
 	
 	virtual void OnPossess(APawn* InPawn) override;
@@ -109,13 +105,13 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientJoinMidgame(FName StateOfMatch, float Warmup, float Match, float StartingTime, float Cooldown);
 
-	void StartConnectionWarning();
-	void StopConnectionWarning();
+	void StartConnectionWarning() const;
+	void StopConnectionWarning() const;
 
-	void HideTeamUIElements();
-	void InitTeamScores();
-	void SetHUDRedTeamScore(int32 RedScore);
-	void SetHUDBlueTeamScore(int32 BlueScore);
+	void HideTeamUIElements() const;
+	void InitTeamScores() const;
+	void SetHUDRedTeamScore(int32 RedScore) const;
+	void SetHUDBlueTeamScore(int32 BlueScore) const;
 	
 
 	FHighPingDelegate HighPingDelegate;
@@ -134,7 +130,7 @@ protected:
 	bool bShowTeamScores = false;
 
 	UFUNCTION()
-	void OnRep_ShowTeamScores();
+	void OnRep_ShowTeamScores() const;
 
 	FString GetInfoText(const TArray<APartyPlayerState*>& PlayerStates);
 	FString GetTeamInfoText(APartyGameState* PartyGameState);

@@ -1,10 +1,8 @@
 #include "UI/PartyHUD.h"
 
-#include "AbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
-#include "Characters/PartyCharacter.h"
 #include "Components/CanvasPanelSlot.h"
 #include "PlayerController/PartyPlayerController.h"
 #include "UI/CharacterOverlay.h"
@@ -78,7 +76,6 @@ void APartyHUD::AddCharacterOverlay()
 		CharacterOverlay->AddToViewport();
 	}
 }
-
 
 void APartyHUD::AddAnnouncement()
 {
@@ -160,4 +157,3 @@ void APartyHUD::ElimAnnouncementTimerFinished(UElimAnnouncement* ElementToRemove
 		ElementToRemove->RemoveFromParent();
 	}
 }
-
