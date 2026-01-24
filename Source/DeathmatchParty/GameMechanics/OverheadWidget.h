@@ -10,6 +10,7 @@ class DEATHMATCHPARTY_API UOverheadWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* DisplayText;
 
@@ -20,5 +21,6 @@ public:
 	void ShowPlayerNetRole(APawn* inPawn);
 
 protected:
+	
 	virtual void NativeDestruct() override;
 };

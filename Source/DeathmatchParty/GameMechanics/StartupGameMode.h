@@ -15,5 +15,4 @@ class DEATHMATCHPARTY_API AStartupGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 	virtual void BeginPlay() override;
-	
 };

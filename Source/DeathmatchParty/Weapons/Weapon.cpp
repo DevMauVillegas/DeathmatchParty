@@ -45,7 +45,6 @@ void AWeapon::EnableCustomDepth(bool bEnable) const
 	}
 }
 
-
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
@@ -66,11 +65,6 @@ void AWeapon::BeginPlay()
 void AWeapon::OnPingTooHigh(bool bPingTooHigh)
 {
 	bUseServerSideRewind = !bPingTooHigh;
-}
-
-void AWeapon::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void AWeapon::OnRep_Owner()

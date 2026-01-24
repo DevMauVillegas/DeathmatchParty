@@ -2,18 +2,19 @@
 
 
 #include "WeaponSpawner.h"
-
 #include "Weapons/Weapon.h"
 
-// Sets default values
 AWeaponSpawner::AWeaponSpawner()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
+	SpawnPickUpTimerMin = 0.0f;
+	
+	SpawnPickUpTimerMax = 9999.9f;
 
+	SpawnedPickUp = nullptr;
 }
 
-// Called when the game starts or when spawned
 void AWeaponSpawner::BeginPlay()
 {
 	Super::BeginPlay();
@@ -51,13 +52,4 @@ void AWeaponSpawner::SpawnPickUpTimerStart()
 	const float SpawnTime = FMath::FRandRange(SpawnPickUpTimerMin, SpawnPickUpTimerMax);
 
 	GetWorldTimerManager().SetTimer(SpawnPickUpTimer, this, &AWeaponSpawner::SpawnPickUpTimerFinished, SpawnTime);
-
 }
-
-// Called every frame
-void AWeaponSpawner::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

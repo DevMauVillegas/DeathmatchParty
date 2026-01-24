@@ -15,18 +15,18 @@ class DEATHMATCHPARTY_API AWeaponSpawner : public AActor
 	
 	FTimerHandle SpawnPickUpTimer;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float SpawnPickUpTimerMin;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float SpawnPickUpTimerMax;
 	
-public:	
-	// Sets default values for this actor's properties
+public:
+	
 	AWeaponSpawner();
 
 protected:
-	// Called when the game starts or when spawned
+
 	virtual void BeginPlay() override;
 
 	void SpawnPickUp();
@@ -40,11 +40,6 @@ protected:
 	UFUNCTION()
 	void SpawnPickUpTimerStart();
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	AWeapon* SpawnedPickUp;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 };

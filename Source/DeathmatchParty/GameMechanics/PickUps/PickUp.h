@@ -25,12 +25,14 @@ class DEATHMATCHPARTY_API APickUp : public AActor
 
 	FTimerHandle BindOverlapHandle;
 
-	float BindOverlapTime = 0.2;
+	UPROPERTY(EditDefaultsOnly)
+	float BindOverlapTime;
 
 	UFUNCTION()
 	void BindOverlapTimeFinish();
 	
-public:	
+public:
+	
 	APickUp();
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroyed() override;

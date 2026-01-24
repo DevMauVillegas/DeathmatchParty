@@ -17,8 +17,6 @@ UCombatComponent::UCombatComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	DefaultVariablesInitialization();
-	
-	// Variables setup
 
 	bCanFire = true;
 	bFireButtonPressed = false;
@@ -32,10 +30,10 @@ UCombatComponent::UCombatComponent()
 	bHoldingFlag = false;
 }
 
-void UCombatComponent::BeginPlay()
+void UCombatComponent::InitializePartyCharacter(APartyCharacter* NewPartyCharacter)
 {
-	Super::BeginPlay();
-
+	PartyCharacter = NewPartyCharacter;
+	
 	if (PartyCharacter)
 	{
 		PartyCharacter->GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
@@ -52,6 +50,11 @@ void UCombatComponent::BeginPlay()
 			InitializeCarriedAmmo();
 		}
 	}
+}
+
+void UCombatComponent::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -355,7 +358,6 @@ void UCombatComponent::SetHUDCrosshair(float DeltaTime)
 		CrosshairAimFactor;
 	
 	HUD->SetHUFPackage(HUDPackage);
-	
 }
 
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
@@ -454,13 +456,15 @@ void UCombatComponent::FireMultipleHitScanWeapon(const FVector_NetQuantize& Trac
 		
 		ShotgunLocalFire(HitTargets);
 		ServerShotgunFire(HitTargets, EquippedWeapon->FireDelay);
-		
 	}
 }
 
 void UCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
 {
-	if (EquippedWeapon == nullptr) return;
+	if (EquippedWeapon == nullptr)
+	{
+		return;
+	}
 	
 	if (PartyCharacter)
 	{
@@ -472,7 +476,12 @@ void UCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
 void UCombatComponent::ShotgunLocalFire(const TArray<FVector_NetQuantize>& TraceHitTargets)
 {
 	AShotgun* Shotgun = Cast<AShotgun>(EquippedWeapon);
-	if (Shotgun == nullptr || PartyCharacter == nullptr) return;
+	
+	if (Shotgun == nullptr || PartyCharacter == nullptr)
+	{
+		return;
+	}
+	
 	if (CombatState == ECombatState::ECS_Reloading || CombatState == ECombatState::ECS_Unoccupied)
 	{
 		PartyCharacter->PlayFireMontage(bAiming);
@@ -534,7 +543,9 @@ void UCombatComponent::FireTimerFinished()
 	{
 		return;
 	}
+	
 	bCanFire = true;
+	
 	if (bFireButtonPressed && EquippedWeapon->bAutomatic)
 	{
 		Fire();
@@ -647,6 +658,7 @@ void UCombatComponent::EquipBackupWeapon(AWeapon* inWeapon)
 	{
 		return;
 	}
+	
 	BackupWeapon = inWeapon;
 	
 	BackupWeapon->SetWeaponState(EWeaponState::EWS_Backup);
@@ -718,20 +730,20 @@ void UCombatComponent::OnRep_CombatState()
 {
 	switch (CombatState)
 	{
-	case ECombatState::ECS_Reloading:
-		if (PartyCharacter && !PartyCharacter->IsLocallyControlled())
-		{
-			HandleReload();
-		}
-		break;
-	case ECombatState::ECS_SwappingWeapon:
-		if (PartyCharacter && !PartyCharacter->IsLocallyControlled())
-		{
-			PartyCharacter->PlaySwapMontage();
-		}
-		break;
-	default:
-		break;
+		case ECombatState::ECS_Reloading:
+			if (PartyCharacter && !PartyCharacter->IsLocallyControlled())
+			{
+				HandleReload();
+			}
+			break;
+		case ECombatState::ECS_SwappingWeapon:
+			if (PartyCharacter && !PartyCharacter->IsLocallyControlled())
+			{
+				PartyCharacter->PlaySwapMontage();
+			}
+			break;
+		default:
+			break;
 	}
 }
 
@@ -753,12 +765,18 @@ void UCombatComponent::HandleReload()
 
 void UCombatComponent::UpdateCarriedAmmo()
 {
-	if (EquippedWeapon == nullptr) return;
+	if (EquippedWeapon == nullptr)
+	{
+		return;
+	}
+	
 	if (CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
 	{
 		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
 	}
+	
 	PartyPlayerController = PartyPlayerController == nullptr ? Cast<APartyPlayerController>(PartyCharacter->Controller) : PartyPlayerController;
+
 	if (PartyPlayerController)
 	{
 		PartyPlayerController->SetHUDCarriedAmmo(CarriedAmmo);

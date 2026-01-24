@@ -204,7 +204,7 @@ void APartyCharacter::PostInitializeComponents()
 
 	if (CombatComponent)
 	{
-		CombatComponent->PartyCharacter = this;
+		CombatComponent->InitializePartyCharacter(this);
 	}
 
 	if (BuffComponent)

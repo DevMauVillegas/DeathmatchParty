@@ -26,8 +26,7 @@ APartyAIController::APartyAIController()
 	SightSenseConfig->DetectionByAffiliation.bDetectFriendlies = true;
 	
 	AIPerceptionComp->ConfigureSense(*SightSenseConfig);
-
-
+	
 	HearingSenseConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("HearingConfig"));
 	HearingSenseConfig->HearingRange = 3000.0f;           // How far AI can hear
 	HearingSenseConfig->SetMaxAge(5.0f);                  // How long AI can remember things heard

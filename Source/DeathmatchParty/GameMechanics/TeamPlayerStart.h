@@ -19,5 +19,4 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	ETeam Team;
-	
 };

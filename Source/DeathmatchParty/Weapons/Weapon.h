@@ -16,7 +16,6 @@ class USoundCue;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponPickedUp);
 
-
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
 {
@@ -120,7 +119,8 @@ class DEATHMATCHPARTY_API AWeapon : public AActor
 		UPrimitiveComponent* OtherComponent,
 		int32 OtherBodyIndex);
 	
-public:	
+public:
+	
 	AWeapon();
 
 	bool bDestroyWeapon = false;
@@ -151,7 +151,6 @@ public:
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
 	UTexture2D* CrosshairRight;
 	
-	virtual void Tick(float DeltaTime) override;
 	virtual void OnRep_Owner() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Fire(const FVector& HitTarget);

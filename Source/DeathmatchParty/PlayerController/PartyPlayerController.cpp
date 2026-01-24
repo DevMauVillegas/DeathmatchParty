@@ -637,7 +637,6 @@ void APartyPlayerController::OnMatchStateSet(FName State, bool bTeamsMatch/* = f
 	if (MatchState == MatchState::InProgress)
 	{
 		HandleMatchHasStarted(bTeamsMatch);
-		
 	}
 	else if (MatchState == MatchState::Cooldown)
 	{

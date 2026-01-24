@@ -3,7 +3,6 @@
 
 #include "NiagaraFunctionLibrary.h"
 #include "Characters/PartyCharacter.h"
-#include "GameMechanics/BuffComponent.h"
 
 ABuffPickUp::ABuffPickUp()
 {

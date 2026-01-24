@@ -12,15 +12,16 @@ class DEATHMATCHPARTY_API ASpeedPickUp : public APickUp
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	ASpeedPickUp();
+	
+	UPROPERTY(EditDefaultsOnly)
 	float BaseSpeedBuff = 1500.0f;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float CrouchSpeedBuff = 800.0f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float SpeedBuffTime = 15.0f;
 
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-	
 };

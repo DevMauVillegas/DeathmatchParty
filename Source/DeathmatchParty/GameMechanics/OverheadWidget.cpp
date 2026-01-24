@@ -1,5 +1,4 @@
 #include "GameMechanics/OverheadWidget.h"
-
 #include "Components/TextBlock.h"
 
 void UOverheadWidget::SetDisplayText(FString inText)

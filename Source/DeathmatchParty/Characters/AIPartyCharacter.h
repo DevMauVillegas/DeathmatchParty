@@ -15,6 +15,4 @@ class DEATHMATCHPARTY_API AAIPartyCharacter : public APartyCharacter
 	GENERATED_BODY()
 
 	virtual void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser) override;
-
-	
 };

@@ -17,16 +17,16 @@ class DEATHMATCHPARTY_API ABuffPickUp : public APickUp
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category="PickUpSettings")
+	UPROPERTY(EditDefaultsOnly, Category="PickUpSettings")
 	float EffectAmount;
 
-	UPROPERTY(EditAnywhere, Category="PickUpSettings")
+	UPROPERTY(EditDefaultsOnly, Category="PickUpSettings")
 	float EffectDuration;
 	
-	UPROPERTY(EditAnywhere, Category="PickUpSettings")
+	UPROPERTY(EditDefaultsOnly, Category="PickUpSettings")
 	float EffectPeriod;
 
-	UPROPERTY(EditAnywhere, Category="PickUpSettings")
+	UPROPERTY(EditDefaultsOnly, Category="PickUpSettings")
 	FGameplayTag EffectTag;
 	
 public:

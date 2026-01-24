@@ -2,15 +2,13 @@
 
 
 #include "GameMechanics/PickUps/JumpPickUp.h"
-
 #include "Characters/PartyCharacter.h"
 #include "GameMechanics/BuffComponent.h"
 
-AJumpPickUp::AJumpPickUp() :
-	JumpVelocityBuff(4000.0f),
-	JumpVelocityTime(20.0f)
+AJumpPickUp::AJumpPickUp()
 {
-	
+	JumpVelocityBuff = 4000.0f;
+	JumpVelocityTime = 20.0f;
 }
 
 void AJumpPickUp::OnSphereOverlap(UPrimitiveComponent* OverlapComponent, AActor* OtherActor,

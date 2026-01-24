@@ -21,24 +21,25 @@ class DEATHMATCHPARTY_API APartyGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
-	float CountdownTime = 0.0f;
+	float CountdownTime;
 
 public:
 
 	APartyGameMode();
 
-	UPROPERTY(EditAnywhere)
-	float WarmUpTime = 5.0f;
+	UPROPERTY(EditDefaultsOnly)
+	float WarmUpTime;
 	
 	UPROPERTY(EditDefaultsOnly)
-	float MatchTime = 120.0f;
+	float MatchTime;
 
 	UPROPERTY(EditDefaultsOnly)
-	float CooldownTime = 10.0f;
-	
-	float LevelStartingTime = 0.0f;
+	float CooldownTime;
 
-	bool bIsTeamMatch = false;
+	UPROPERTY(EditDefaultsOnly)
+	float LevelStartingTime;
+
+	bool bIsTeamMatch;
 	
 	virtual void PlayerEliminated(APartyCharacter* EliminatedCharacter, APartyPlayerController* VictimController, APartyPlayerController* AttackerController);
 	virtual void RequestRespawn(ACharacter* EliminatedCharacter, AController* EliminatedController);

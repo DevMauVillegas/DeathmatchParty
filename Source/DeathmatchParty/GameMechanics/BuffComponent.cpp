@@ -3,23 +3,14 @@
 #include "Characters/PartyCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-UBuffComponent::UBuffComponent():
-	Character(nullptr),
-	InitialBaseSpeed(0),
-	InitialCrouchSpeed(0),
-	InitialJumpVelocity(0)
+UBuffComponent::UBuffComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-}
-
-void UBuffComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-void UBuffComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	Character = nullptr;
+	InitialBaseSpeed = 0;
+	InitialCrouchSpeed = 0;
+	InitialJumpVelocity = 0;
 }
 
 void UBuffComponent::SetInitialSpeeds(float BaseSpeed, float CrouchSpeed)

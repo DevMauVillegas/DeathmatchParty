@@ -22,6 +22,7 @@ public:
 	APartyAIController();
 
 protected:
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	UAIPerceptionComponent* AIPerceptionComp;
 

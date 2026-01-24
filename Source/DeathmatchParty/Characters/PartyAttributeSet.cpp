@@ -2,7 +2,6 @@
 
 
 #include "PartyAttributeSet.h"
-
 #include "Net/UnrealNetwork.h"
 
 UPartyAttributeSet::UPartyAttributeSet()
@@ -14,7 +13,6 @@ UPartyAttributeSet::UPartyAttributeSet()
 	CrouchSpeed = 330.0f;
 	JumpSpeed = 100.0f;
 	FireRate = 16.0f;
-	
 }
 
 void UPartyAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

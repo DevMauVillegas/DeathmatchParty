@@ -2,7 +2,6 @@
 
 
 #include "GameMechanics/StartupGameMode.h"
-
 #include "GameFramework/GameUserSettings.h"
 
 void AStartupGameMode::BeginPlay()

@@ -15,6 +15,18 @@ namespace MatchState
 APartyGameMode::APartyGameMode()
 {
 	bDelayedStart = true;
+	
+	CountdownTime = 0.0f;
+
+	WarmUpTime = 5.0f;
+	
+	MatchTime = 120.0f;
+
+	CooldownTime = 10.0f;
+	
+	LevelStartingTime = 0.0f;
+
+	bIsTeamMatch = false;
 }
 
 void APartyGameMode::BeginPlay()

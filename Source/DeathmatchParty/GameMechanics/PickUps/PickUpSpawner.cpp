@@ -1,6 +1,5 @@
 
 #include "GameMechanics/PickUps/PickUpSpawner.h"
-
 #include "GameMechanics/PickUps/PickUp.h"
 
 // Sets default values
@@ -18,7 +17,6 @@ void APickUpSpawner::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnPickUpTimerStart((AActor*)nullptr);
-
 }
 
 void APickUpSpawner::SpawnPickUp()
@@ -51,11 +49,5 @@ void APickUpSpawner::SpawnPickUpTimerStart(AActor* DestroyedActor)
 	const float SpawnTime = FMath::FRandRange(SpawnPickUpTimerMin, SpawnPickUpTimerMax);
 
 	GetWorldTimerManager().SetTimer(SpawnPickUpTimer, this, &APickUpSpawner::SpawnPickUpTimerFinished, SpawnTime);
-}
-
-void APickUpSpawner::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 

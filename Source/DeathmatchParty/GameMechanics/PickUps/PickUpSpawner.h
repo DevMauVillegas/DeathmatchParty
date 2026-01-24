@@ -23,7 +23,6 @@ class DEATHMATCHPARTY_API APickUpSpawner : public AActor
 	
 public:	
 	APickUpSpawner();
-	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;

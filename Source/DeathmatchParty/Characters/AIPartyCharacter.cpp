@@ -2,10 +2,6 @@
 
 
 #include "AIPartyCharacter.h"
-
-#include "AIController.h"
-#include "PartyAIController.h"
-#include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Damage.h"
 
 void AAIPartyCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,

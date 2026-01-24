@@ -2,7 +2,6 @@
 
 
 #include "CaptureFlagGameMode.h"
-
 #include "GameMechanics/FlagZone.h"
 #include "GameState/PartyGameState.h"
 #include "Kismet/GameplayStatics.h"
@@ -11,7 +10,6 @@
 void ACaptureFlagGameMode::PlayerEliminated(APartyCharacter* EliminatedCharacter,
                                             APartyPlayerController* VictimController, APartyPlayerController* AttackerController)
 {
-	// Calling super super
 	APartyGameMode::PlayerEliminated(EliminatedCharacter, VictimController, AttackerController);
 }
 

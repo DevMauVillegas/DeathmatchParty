@@ -15,9 +15,11 @@ class DEATHMATCHPARTY_API ATeamPartyGameMode : public APartyGameMode
 	GENERATED_BODY()
 
 protected:
+	
 	virtual void HandleMatchHasStarted() override;
 
 public:
+	
 	ATeamPartyGameMode();
 	
 	virtual void PostLogin(APlayerController* NewPlayer) override;

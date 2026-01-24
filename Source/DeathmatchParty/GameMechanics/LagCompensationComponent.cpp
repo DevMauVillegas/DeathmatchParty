@@ -2,7 +2,6 @@
 #include "GameMechanics/LagCompensationComponent.h"
 
 #include "DeathmatchParty.h"
-#include "ProjectDescriptor.h"
 #include "Characters/PartyCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -13,11 +12,6 @@ ULagCompensationComponent::ULagCompensationComponent() :
 	PartyController(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-}
-
-void ULagCompensationComponent::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 void ULagCompensationComponent::SaveFramePackage()
@@ -45,7 +39,6 @@ void ULagCompensationComponent::TickComponent(
 	{
 		SaveFramePackage();
 	}
-	
 }
 
 void ULagCompensationComponent::SaveFramePackage(FFramePackage& FramePackage)
@@ -560,4 +553,3 @@ void ULagCompensationComponent::ServerScoreRequest_Implementation(
 		);
 	}
 }
-

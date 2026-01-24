@@ -78,6 +78,7 @@ class DEATHMATCHPARTY_API UPartyAnimInstance : public UAnimInstance
 	bool bHoldingFlag;
 
 public:
+	
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 };

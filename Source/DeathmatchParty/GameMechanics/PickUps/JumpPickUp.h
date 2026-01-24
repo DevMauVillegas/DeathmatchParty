@@ -14,10 +14,10 @@ class DEATHMATCHPARTY_API AJumpPickUp : public APickUp
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float JumpVelocityBuff;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float JumpVelocityTime;
 
 public:

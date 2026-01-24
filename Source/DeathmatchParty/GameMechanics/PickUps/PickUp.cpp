@@ -2,7 +2,6 @@
 #include "GameMechanics/PickUps/PickUp.h"
 
 #include "NiagaraComponent.h"
-#include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
 #include "Sound/SoundCue.h"
@@ -33,6 +32,8 @@ APickUp::APickUp()
 
 	PickUpEffectComponent = CreateDefaultSubobject<UNiagaraComponent>("PickUpEffectComponent");
 	PickUpEffectComponent->SetupAttachment(RootComponent);
+
+	BindOverlapTime = 0.2;
 }
 
 void APickUp::BeginPlay()
@@ -56,7 +57,6 @@ void APickUp::Tick(float DeltaTime)
 	{
 		PickUpMesh->AddLocalRotation(FRotator(0.0f, BaseTurnRate * DeltaTime, 0.0f));
 	}
-
 }
 
 void APickUp::Destroyed()

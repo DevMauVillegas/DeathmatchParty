@@ -134,6 +134,8 @@ class DEATHMATCHPARTY_API UCombatComponent : public UActorComponent
 public:	
 	UCombatComponent();
 
+	void InitializePartyCharacter(APartyCharacter* NewPartyCharacter);
+
 	friend class APartyCharacter;
 
 	UFUNCTION(BlueprintCallable)

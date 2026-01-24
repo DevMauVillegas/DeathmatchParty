@@ -22,6 +22,7 @@ class DEATHMATCHPARTY_API AAmmoPickup : public APickUp
 	int32 AmmoAmount = 15;
 
 protected:
+	
 	virtual void OnSphereOverlap(
 		UPrimitiveComponent* OverlapComponent,
 		AActor* OtherActor,

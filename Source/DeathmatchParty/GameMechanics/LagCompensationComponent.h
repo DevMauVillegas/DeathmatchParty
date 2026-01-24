@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "Characters/PartyCharacter.h"
 #include "Components/ActorComponent.h"
-#include "Containers/CircularQueue.h"
 #include "LagCompensationComponent.generated.h"
 
 class APartyPlayerController;
@@ -84,7 +83,7 @@ public:
 	APartyPlayerController* PartyController;
 
 protected:
-	virtual void BeginPlay() override;
+	
 	void SaveFramePackage();
 
 	void SaveFramePackage(FFramePackage& FramePackage);
