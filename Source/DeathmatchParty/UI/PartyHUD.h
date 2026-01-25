@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "PartyHUDInterface.h"
 #include "GameFramework/HUD.h"
+#include "GameState/PartyGameState.h"
 #include "PartyHUD.generated.h"
 
 class APartyPlayerController;
@@ -79,9 +80,28 @@ public:
 
 	virtual void SetShield(float Current, float Max) override;
 	virtual void SetHealth(float Current, float Max) override;
-	virtual void SetMatchTime(float Seconds) override;
+	virtual void SetScore(const int32 NewScore) override;
+	virtual void SetDefeats(const int32 NewDefeats) override;
+	virtual void SetWeaponAmmo(const int32 NewWeaponAmmo) override;
+	virtual void SetCarriedAmmo(const int32 NewCarriedAmmo) override;
+
+	virtual void SetRedTeamScore(const int32 NewRedTeamScore) override;
+	virtual void SetBlueTeamScore(const int32 NewBlueTeamScore) override;
+	virtual void HideTeamUIElements() override;
+
+	virtual void SetAnnouncementCountdown(const float NewAnnouncementCountdownTime) override;
+	virtual void SetMatchTime(const float NewTimerValue) override;
+
+	virtual void HandleCooldown() override;
+
+	virtual void DisplayConnectionWarning(const bool bDisplayConnectionWarning) override;
+
+	void ShowTeamScoresUpdated(const bool bShowTeamScores);
 	
 	void AddCharacterOverlay();
+
+	FString GetTeamInfoText(const APartyGameState* PartyGameState);
+	FString GetInfoText(const TArray<APartyPlayerState*>& PlayerStates);
 
 	UPROPERTY(EditAnywhere, Category= "Player Stats")
 	TSubclassOf<UUserWidget> CharacterOverlayClass;
@@ -94,6 +114,8 @@ public:
 	
 	UPROPERTY()
 	UCharacterOverlay* CharacterOverlay;
+
+	bool bShowTeamScores;
 
 	void AddAnnouncement();
 

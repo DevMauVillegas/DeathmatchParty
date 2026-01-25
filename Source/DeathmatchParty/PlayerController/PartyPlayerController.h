@@ -97,15 +97,13 @@ public:
 	virtual void ReceivedPlayer() override;
 	virtual float GetServerTime();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	void DisplayConnectionWarning(bool bDisplayConnectionWarning) const;
 
 	UFUNCTION(Server, Reliable)
 	void ServerCheckMatchState();
 
 	UFUNCTION(Client, Reliable)
 	void ClientJoinMidgame(FName StateOfMatch, float Warmup, float Match, float StartingTime, float Cooldown);
-
-	void StartConnectionWarning() const;
-	void StopConnectionWarning() const;
 
 	void HideTeamUIElements() const;
 	void InitTeamScores() const;
@@ -130,9 +128,6 @@ protected:
 
 	UFUNCTION()
 	void OnRep_ShowTeamScores() const;
-
-	FString GetInfoText(const TArray<APartyPlayerState*>& PlayerStates);
-	FString GetTeamInfoText(APartyGameState* PartyGameState);
 
 	UPROPERTY(EditAnywhere, Category=Time)
 	float TimeSyncFrequency = 5.0f;
