@@ -11,17 +11,20 @@
 void ATeamPartyGameMode::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
-
-	if (APartyGameState* PartyGameState = Cast<APartyGameState>(UGameplayStatics::GetGameState(this)))
+	
+	APartyGameState* PartyGameState = Cast<APartyGameState>(UGameplayStatics::GetGameState(this));
+	if (PartyGameState == nullptr)
 	{
-		for (TObjectPtr<APlayerState> PlayerState : PartyGameState->PlayerArray)
+		return;
+	}
+	
+	for (TObjectPtr<APlayerState> PlayerState : PartyGameState->PlayerArray)
+	{
+		if (APartyPlayerState* PartyPlayerState = Cast<APartyPlayerState>(PlayerState.Get()); PartyPlayerState->GetPlayerTeam() == ETeam::ET_NoTeam)
 		{
-			if (APartyPlayerState* PartyPlayerState = Cast<APartyPlayerState>(PlayerState.Get()); PartyPlayerState->GetPlayerTeam() == ETeam::ET_NoTeam)
-			{
-				const bool bIsBlueTeamBigger = PartyGameState->BlueTeam.Num() > PartyGameState->RedTeam.Num();
-				bIsBlueTeamBigger ? PartyGameState->RedTeam.AddUnique(PartyPlayerState) : PartyGameState->BlueTeam.AddUnique(PartyPlayerState);
-				PartyPlayerState->SetPlayerTeam(bIsBlueTeamBigger ? ETeam::ET_RedTeam : ETeam::ET_BlueTeam);
-			}
+			const bool bIsBlueTeamBigger = PartyGameState->BlueTeam.Num() > PartyGameState->RedTeam.Num();
+			bIsBlueTeamBigger ? PartyGameState->RedTeam.AddUnique(PartyPlayerState) : PartyGameState->BlueTeam.AddUnique(PartyPlayerState);
+			PartyPlayerState->SetPlayerTeam(bIsBlueTeamBigger ? ETeam::ET_RedTeam : ETeam::ET_BlueTeam);
 		}
 	}
 }
@@ -40,14 +43,17 @@ void ATeamPartyGameMode::PostLogin(APlayerController* NewPlayer)
 		return;
 	}
 
-	if (APartyGameState* PartyGameState = Cast<APartyGameState>(UGameplayStatics::GetGameState(this)))
+	APartyGameState* PartyGameState = Cast<APartyGameState>(UGameplayStatics::GetGameState(this));
+	if (PartyGameState == nullptr)
 	{
-		if (APartyPlayerState* PartyPlayerState = NewPlayer->GetPlayerState<APartyPlayerState>(); PartyPlayerState->GetPlayerTeam() == ETeam::ET_NoTeam)
-		{
-			const bool bIsBlueTeamBigger = PartyGameState->BlueTeam.Num() > PartyGameState->RedTeam.Num();
-			bIsBlueTeamBigger ? PartyGameState->RedTeam.AddUnique(PartyPlayerState) : PartyGameState->BlueTeam.AddUnique(PartyPlayerState);
-			PartyPlayerState->SetPlayerTeam(bIsBlueTeamBigger ? ETeam::ET_RedTeam : ETeam::ET_BlueTeam);
-		}
+		return;
+	}
+	
+	if (APartyPlayerState* PartyPlayerState = NewPlayer->GetPlayerState<APartyPlayerState>(); PartyPlayerState->GetPlayerTeam() == ETeam::ET_NoTeam)
+	{
+		const bool bIsBlueTeamBigger = PartyGameState->BlueTeam.Num() > PartyGameState->RedTeam.Num();
+		bIsBlueTeamBigger ? PartyGameState->RedTeam.AddUnique(PartyPlayerState) : PartyGameState->BlueTeam.AddUnique(PartyPlayerState);
+		PartyPlayerState->SetPlayerTeam(bIsBlueTeamBigger ? ETeam::ET_RedTeam : ETeam::ET_BlueTeam);
 	}
 }
 
@@ -60,13 +66,16 @@ void ATeamPartyGameMode::Logout(AController* Exiting)
 		return;
 	}
 	
-	if (APartyGameState* PartyGameState = Cast<APartyGameState>(UGameplayStatics::GetGameState(this)))
+	APartyGameState* PartyGameState = Cast<APartyGameState>(UGameplayStatics::GetGameState(this));
+	if (PartyGameState == nullptr)
 	{
-		if (APartyPlayerState* PartyPlayerState = Exiting->GetPlayerState<APartyPlayerState>())
-		{
-			PartyGameState->RedTeam.Remove(PartyPlayerState);
-			PartyGameState->BlueTeam.Remove(PartyPlayerState);
-		}
+		return;
+	}
+	
+	if (APartyPlayerState* PartyPlayerState = Exiting->GetPlayerState<APartyPlayerState>())
+	{
+		PartyGameState->RedTeam.Remove(PartyPlayerState);
+		PartyGameState->BlueTeam.Remove(PartyPlayerState);
 	}
 }
 
@@ -80,17 +89,20 @@ void ATeamPartyGameMode::PlayerEliminated(APartyCharacter* EliminatedCharacter,
 	{
 		return;
 	}
-	
-	if (APartyGameState* PartyGameState = Cast<APartyGameState>(UGameplayStatics::GetGameState(this)))
+
+	APartyGameState* PartyGameState = Cast<APartyGameState>(UGameplayStatics::GetGameState(this));
+	if (PartyGameState == nullptr)
 	{
-		if (AttackerPlayerState->GetPlayerTeam() == ETeam::ET_BlueTeam)
-		{
-			PartyGameState->AddBlueTeamScore();
-		}
-		else if (AttackerPlayerState->GetPlayerTeam() == ETeam::ET_RedTeam)
-		{
-			PartyGameState->AddRedTeamScore();
-		}
+		return;
+	}
+	
+	if (AttackerPlayerState->GetPlayerTeam() == ETeam::ET_BlueTeam)
+	{
+		PartyGameState->AddBlueTeamScore();
+	}
+	else if (AttackerPlayerState->GetPlayerTeam() == ETeam::ET_RedTeam)
+	{
+		PartyGameState->AddRedTeamScore();
 	}
 }
 

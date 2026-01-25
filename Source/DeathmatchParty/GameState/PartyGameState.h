@@ -14,9 +14,7 @@ class DEATHMATCHPARTY_API APartyGameState : public AGameState
 	float TopScore = 0.0f;
 	
 public:
-	/**
-	 * 
-	 */
+
 	UPROPERTY(Replicated)
 	TArray<APartyPlayerState*> TopScoringPlayers;
 	
@@ -38,17 +36,9 @@ public:
 
 	void AddRedTeamScore();
 	void AddBlueTeamScore();
-
-	/**
-	 * 
-	 * @param ScoringPlayer player making the score
-	 */
-	void UpdateTopScores(APartyPlayerState* ScoringPlayer);
-
-	/**
-	 * 
-	 * @param OutLifetimeProps 
-	 */
+	
+	void UpdateTopScores(APartyPlayerState* ScoringPlayerState);
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 };

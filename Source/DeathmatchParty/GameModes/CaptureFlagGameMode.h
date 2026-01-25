@@ -8,6 +8,7 @@
 
 class AFlag;
 class AFlagZone;
+
 /**
  * 
  */
@@ -20,5 +21,5 @@ public:
 	
 	virtual void PlayerEliminated(APartyCharacter* EliminatedCharacter, APartyPlayerController* VictimController, APartyPlayerController* AttackerController) override;
 
-	void FlagCaptured(AFlag* Flag, AFlagZone* FlagZone) const;
+	void FlagCaptured(const AFlag* Flag, const AFlagZone* FlagZone) const;
 };

@@ -341,6 +341,8 @@ void APartyPlayerController::SetupInputComponent()
 
 void APartyPlayerController::SetHUDHealth(float Health, float MaxHealth) const
 {
+	//TODO: move this and the other awful functions to the hud or interface
+	
 	if (PartyHUD &&
 		PartyHUD->CharacterOverlay &&
 		PartyHUD->CharacterOverlay->HealthBar &&

@@ -6,7 +6,6 @@
 #include "UObject/Interface.h"
 #include "InteractWithCrosshairInterface.generated.h"
 
-// This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UInteractWithCrosshairInterface : public UInterface
 {

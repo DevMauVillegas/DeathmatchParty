@@ -11,7 +11,6 @@ class APartyPlayerState;
 class UReturnToMainMenuScreen;
 class APartyHUD;
 class APartyGameMode;
-class UCharacterOverlay;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHighPingDelegate, bool, bPingTooHigh);
 

@@ -157,3 +157,15 @@ void APartyHUD::ElimAnnouncementTimerFinished(UElimAnnouncement* ElementToRemove
 		ElementToRemove->RemoveFromParent();
 	}
 }
+
+void APartyHUD::SetShield(float Current, float Max)
+{
+}
+
+void APartyHUD::SetHealth(float Current, float Max)
+{
+}
+
+void APartyHUD::SetMatchTime(float Seconds)
+{
+}

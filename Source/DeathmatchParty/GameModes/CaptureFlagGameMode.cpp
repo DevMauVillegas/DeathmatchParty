@@ -13,7 +13,7 @@ void ACaptureFlagGameMode::PlayerEliminated(APartyCharacter* EliminatedCharacter
 	APartyGameMode::PlayerEliminated(EliminatedCharacter, VictimController, AttackerController);
 }
 
-void ACaptureFlagGameMode::FlagCaptured(AFlag* Flag, AFlagZone* FlagZone) const
+void ACaptureFlagGameMode::FlagCaptured(const AFlag* Flag, const AFlagZone* FlagZone) const
 {
 	bool bValidCapture = Flag->GetWeaponTeam() != FlagZone->ZoneTeam;
 

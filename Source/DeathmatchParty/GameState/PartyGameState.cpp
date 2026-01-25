@@ -48,28 +48,28 @@ void APartyGameState::AddBlueTeamScore()
 	}
 }
 
-void APartyGameState::UpdateTopScores(APartyPlayerState* ScoringPlayer)
+void APartyGameState::UpdateTopScores(APartyPlayerState* ScoringPlayerState)
 {
-	if (ScoringPlayer == nullptr)
+	if (ScoringPlayerState == nullptr)
 	{
 		return;
 	}
 
-	const float PlayerScore = ScoringPlayer->GetScore();
+	const float PlayerScore = ScoringPlayerState->GetScore();
 	
 	if (TopScoringPlayers.Num() == 0)
 	{
-		TopScoringPlayers.Add(ScoringPlayer);
+		TopScoringPlayers.Add(ScoringPlayerState);
 		TopScore = PlayerScore;
 	}
 	else if (PlayerScore == TopScore)
 	{
-		TopScoringPlayers.AddUnique(ScoringPlayer);
+		TopScoringPlayers.AddUnique(ScoringPlayerState);
 	}
 	else if (PlayerScore > TopScore)
 	{
 		TopScoringPlayers.Empty();
-		TopScoringPlayers.AddUnique(ScoringPlayer);
+		TopScoringPlayers.AddUnique(ScoringPlayerState);
 		TopScore = PlayerScore;
 	}
 }

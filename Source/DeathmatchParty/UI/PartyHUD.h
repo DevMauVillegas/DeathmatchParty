@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PartyHUDInterface.h"
 #include "GameFramework/HUD.h"
 #include "PartyHUD.generated.h"
 
@@ -47,7 +48,7 @@ struct FHUDPackage
 };
 
 UCLASS()
-class DEATHMATCHPARTY_API APartyHUD : public AHUD
+class DEATHMATCHPARTY_API APartyHUD : public AHUD, public IPartyHUDInterface
 {
 	GENERATED_BODY()
 
@@ -75,6 +76,10 @@ class DEATHMATCHPARTY_API APartyHUD : public AHUD
 	
 	
 public:
+
+	virtual void SetShield(float Current, float Max) override;
+	virtual void SetHealth(float Current, float Max) override;
+	virtual void SetMatchTime(float Seconds) override;
 	
 	void AddCharacterOverlay();
 
