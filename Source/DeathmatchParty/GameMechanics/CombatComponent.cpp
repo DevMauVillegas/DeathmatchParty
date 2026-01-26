@@ -616,12 +616,13 @@ void UCombatComponent::EquipPrimaryWeapon(AWeapon* inWeapon)
 	
 	EquippedWeapon = inWeapon;
 	
-	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
-
-	AttachPrimaryWeapon(EquippedWeapon);
-
 	EquippedWeapon->SetOwner(PartyCharacter);
-	EquippedWeapon->SetHUDAmmo();
+	
+	AttachPrimaryWeapon(EquippedWeapon);
+	
+	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+	
+	//EquippedWeapon->SetHUDAmmo();
 
 	EWeaponType WeaponType = EquippedWeapon->GetWeaponType();
 	if (CarriedAmmoMap.Contains(WeaponType))

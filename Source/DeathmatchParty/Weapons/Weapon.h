@@ -80,7 +80,7 @@ class DEATHMATCHPARTY_API AWeapon : public AActor
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
 	float AimSpread = 0.5f;
 
-	UPROPERTY(EditAnywhere, Category="Weapon Properties")
+	UPROPERTY(ReplicatedUsing=OnRep_WeaponAmmo, EditAnywhere, Category="Weapon Properties")
 	float WeaponAmmo = 10.f;
 
 	UPROPERTY(EditAnywhere, Category="Weapon Properties")
@@ -97,8 +97,8 @@ class DEATHMATCHPARTY_API AWeapon : public AActor
 	UFUNCTION()
 	void OnRep_WeaponState();
 
-	UFUNCTION(Client, Reliable)
-	void ClientUpdateAmmo(int32 ServerAmmo);
+	UFUNCTION()
+	void OnRep_WeaponAmmo();
 
 	UFUNCTION(Client, Reliable)
 	void ClientAddAmmo(int32 AmmoToAdd);
@@ -160,6 +160,7 @@ public:
 	virtual void Dropped();
 	bool IsEmpty();
 	void DisplayPickupWidget(bool bDisplayWidget) const;
+	void ResolveOwnerReferences();
 	void SetWeaponState(EWeaponState State);
 	void AddAmmo(int32 AmmoToAdd);
 	void SetHUDAmmo();

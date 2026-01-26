@@ -71,6 +71,8 @@ void AWeapon::OnRep_Owner()
 {
 	Super::OnRep_Owner();
 
+	ResolveOwnerReferences();
+
 	if (Owner == nullptr)
 	{
 		PartyControllerOwner = nullptr;
@@ -78,7 +80,8 @@ void AWeapon::OnRep_Owner()
 	}
 	else
 	{
-		PartyCharacterOwner = PartyCharacterOwner == nullptr ? Cast<APartyCharacter>(Owner) : PartyCharacterOwner;
+		ResolveOwnerReferences();
+		
 		if (PartyCharacterOwner && PartyCharacterOwner->GetEquippedWeapon() && PartyCharacterOwner->GetEquippedWeapon() == this)
 		{
 			SetHUDAmmo();
@@ -100,7 +103,9 @@ void AWeapon::Dropped()
 
 	FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, true);
 	WeaponMesh->DetachFromComponent(DetachRules);
+	
 	SetOwner(nullptr);
+
 	PartyCharacterOwner = nullptr;
 	PartyControllerOwner = nullptr;
 }
@@ -122,12 +127,8 @@ void AWeapon::OnRep_WeaponState()
 	OnWeaponStateSet();
 }
 
-void AWeapon::ClientUpdateAmmo_Implementation(int32 ServerAmmo)
+void AWeapon::OnRep_WeaponAmmo()
 {
-	if (HasAuthority()) return;
-	WeaponAmmo = ServerAmmo;
-	--AmmoSequence;
-	WeaponAmmo -= AmmoSequence;
 	SetHUDAmmo();
 }
 
@@ -158,21 +159,19 @@ void AWeapon::OnWeaponStateSet()
 void AWeapon::OnEquipped()
 {
 	DisplayPickupWidget(false);
+	
 	AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	WeaponMesh->SetSimulatePhysics(false);
 	WeaponMesh->SetEnableGravity(false);
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	ResolveOwnerReferences();
+
 	if (HasAuthority() && bUseServerSideRewind)
 	{
-		PartyCharacterOwner = PartyCharacterOwner == nullptr ? Cast<APartyCharacter>(GetOwner()) : PartyCharacterOwner;
-		if (PartyCharacterOwner)
+		if (PartyControllerOwner && !PartyControllerOwner->HighPingDelegate.IsBound())
 		{
-			PartyControllerOwner = PartyControllerOwner == nullptr ? Cast<APartyPlayerController>(PartyCharacterOwner->Controller) : PartyControllerOwner;
-			if (PartyControllerOwner && !PartyControllerOwner->HighPingDelegate.IsBound())
-			{
-				PartyControllerOwner->HighPingDelegate.AddDynamic(this, &AWeapon::OnPingTooHigh);
-			}
+			PartyControllerOwner->HighPingDelegate.AddDynamic(this, &AWeapon::OnPingTooHigh);
 		}
 	}
 }
@@ -194,14 +193,9 @@ void AWeapon::OnDropped()
 
 	if (HasAuthority() && bUseServerSideRewind)
 	{
-		PartyCharacterOwner = PartyCharacterOwner == nullptr ? Cast<APartyCharacter>(GetOwner()) : PartyCharacterOwner;
-		if (PartyCharacterOwner)
+		if (PartyControllerOwner && PartyControllerOwner->HighPingDelegate.IsBound())
 		{
-			PartyControllerOwner = PartyControllerOwner == nullptr ? Cast<APartyPlayerController>(PartyCharacterOwner->Controller) : PartyControllerOwner;
-			if (PartyControllerOwner && PartyControllerOwner->HighPingDelegate.IsBound())
-			{
-				PartyControllerOwner->HighPingDelegate.RemoveDynamic(this, &AWeapon::OnPingTooHigh);
-			}
+			PartyControllerOwner->HighPingDelegate.RemoveDynamic(this, &AWeapon::OnPingTooHigh);
 		}
 	}
 }
@@ -216,14 +210,9 @@ void AWeapon::OnBackup()
 
 	if (HasAuthority() && bUseServerSideRewind)
 	{
-		PartyCharacterOwner = PartyCharacterOwner == nullptr ? Cast<APartyCharacter>(GetOwner()) : PartyCharacterOwner;
-		if (PartyCharacterOwner)
+		if (PartyControllerOwner && PartyControllerOwner->HighPingDelegate.IsBound())
 		{
-			PartyControllerOwner = PartyControllerOwner == nullptr ? Cast<APartyPlayerController>(PartyCharacterOwner->Controller) : PartyControllerOwner;
-			if (PartyControllerOwner && PartyControllerOwner->HighPingDelegate.IsBound())
-			{
-				PartyControllerOwner->HighPingDelegate.RemoveDynamic(this, &AWeapon::OnPingTooHigh);
-			}
+			PartyControllerOwner->HighPingDelegate.RemoveDynamic(this, &AWeapon::OnPingTooHigh);
 		}
 	}
 }
@@ -232,7 +221,6 @@ void AWeapon::AddAmmo(int32 AmmoToAdd)
 {
 	WeaponAmmo = FMath::Clamp(WeaponAmmo + AmmoToAdd, 0, MagazineCapacity);
 	SetHUDAmmo();
-	ClientAddAmmo(AmmoToAdd);
 }
 
 void AWeapon::Fire(const FVector& HitTarget)
@@ -270,7 +258,11 @@ void AWeapon::Fire(const FVector& HitTarget)
 
 void AWeapon::ClientAddAmmo_Implementation(int32 AmmoToAdd)
 {
-	if (HasAuthority()) return;
+	if (HasAuthority())
+	{
+		return;
+	}
+	
 	WeaponAmmo = FMath::Clamp(WeaponAmmo + AmmoToAdd, 0, MagazineCapacity);
 	SetHUDAmmo();
 }
@@ -315,16 +307,9 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlapComponent, AActor* 
 
 void AWeapon::SetHUDAmmo()
 {
-	PartyCharacterOwner = PartyCharacterOwner == nullptr ? Cast<APartyCharacter>(GetOwner()) : PartyCharacterOwner;
-
-	if (PartyCharacterOwner)
+	if (PartyControllerOwner)
 	{
-		PartyControllerOwner = PartyControllerOwner == nullptr ? Cast<APartyPlayerController>(PartyCharacterOwner->Controller) : PartyControllerOwner;
-
-		if (PartyControllerOwner)
-		{
-			PartyControllerOwner->SetHUDWeaponAmmo(WeaponAmmo);
-		}
+		PartyControllerOwner->SetHUDWeaponAmmo(WeaponAmmo);
 	}
 }
 
@@ -347,7 +332,6 @@ FVector_NetQuantize AWeapon::TraceEndWithScatter(const FVector& HitTarget)
 
 void AWeapon::MultipleTraceEndWithScatter(const FVector& HitTarget, TArray<FVector_NetQuantize>& HitTargets, uint32 NumberOfShots)
 {
-
 	const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash");
 	if (MuzzleFlashSocket == nullptr) return;
 
@@ -380,4 +364,13 @@ void AWeapon::DisplayPickupWidget(bool bDisplayWidget) const
 	{
 		PickupWidget->SetVisibility(bDisplayWidget);
 	}
+}
+
+void AWeapon::ResolveOwnerReferences()
+{
+	PartyCharacterOwner = Cast<APartyCharacter>(GetOwner());
+
+	PartyControllerOwner = PartyCharacterOwner
+		? Cast<APartyPlayerController>(PartyCharacterOwner->Controller)
+		: nullptr;
 }

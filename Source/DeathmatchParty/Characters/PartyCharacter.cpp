@@ -96,8 +96,6 @@ void APartyCharacter::BeginPlay()
 	{
 		OnTakeAnyDamage.AddDynamic(this, &ThisClass::ReceiveDamage);
 	}
-
-	SpawnDefaultWeapon();
 }
 
 void APartyCharacter::Tick(const float DeltaTime)
@@ -603,6 +601,8 @@ void APartyCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	CachedPartyPlayerController =  Cast<APartyPlayerController>(NewController);
+
+	SpawnDefaultWeapon();
 	UpdateHUDAmmo();
 }
 
