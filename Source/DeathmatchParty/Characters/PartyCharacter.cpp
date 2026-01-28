@@ -126,8 +126,6 @@ void APartyCharacter::SpawnDefaultWeapon()
 
 ETeam APartyCharacter::GetTeam()
 {
-	PartyPlayerState = PartyPlayerState == nullptr ? GetPlayerState<APartyPlayerState>() : PartyPlayerState;
-
 	if (PartyPlayerState == nullptr)
 	{
 		return ETeam::ET_NoTeam;
@@ -591,7 +589,6 @@ void APartyCharacter::ServerLeaveGame_Implementation()
 {
 	if (PartyGameMode)
 	{
-		PartyPlayerState = PartyPlayerState == nullptr ? GetPlayerState<APartyPlayerState>() : PartyPlayerState;
 		PartyGameMode->PlayerLeftGame(PartyPlayerState);
 	}
 }
@@ -611,6 +608,7 @@ void APartyCharacter::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayer
 	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
 	
 	PartyPlayerState = GetPlayerState<APartyPlayerState>();
+	
 	if (PartyPlayerState)
 	{
 		PartyPlayerState->AddToScore(0);
