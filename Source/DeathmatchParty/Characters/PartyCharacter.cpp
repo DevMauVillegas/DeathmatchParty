@@ -66,8 +66,8 @@ APartyCharacter::APartyCharacter()
 
 	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 
-	NetUpdateFrequency = 56.f;
-	MinNetUpdateFrequency = 33.f;
+	SetNetUpdateFrequency(56.f);
+	SetMinNetUpdateFrequency(33.f);
 
 	TurnThreshold = 3.0f;
 

@@ -36,7 +36,6 @@ void UCombatComponent::InitializePartyCharacter(APartyCharacter* NewPartyCharact
 	
 	if (PartyCharacter)
 	{
-		PartyCharacter->GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 		FollowCamera = PartyCharacter->GetFollowCamera();
 		
 		if (FollowCamera)
