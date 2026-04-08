@@ -395,4 +395,9 @@ protected:
 	void AimOffset(float DeltaTime);
 
 	void SimProxisTurn();
+	
+	const FName RifleAimSection = TEXT("RifleAim");
+	const FName RifleHipSection = TEXT("RifleHip");
+	
+	const FGameplayTag DamageEffectTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Damage"));
 };

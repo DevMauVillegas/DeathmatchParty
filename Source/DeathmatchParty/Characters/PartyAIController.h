@@ -23,8 +23,8 @@ public:
 
 protected:
 	
-	/*	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-		UAIPerceptionComponent* AIPerceptionComp;*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	UAIPerceptionComponent* AIPerceptionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	UAISenseConfig_Damage* DamageSenseConfig;

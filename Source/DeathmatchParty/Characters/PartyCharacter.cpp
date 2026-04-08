@@ -75,7 +75,7 @@ APartyCharacter::APartyCharacter()
 	
 	bLeftGame = false;
 
-	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DIssolveTimelineComponent"));
+	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimelineComponent"));
 
 	SetupCollisionBoxes();
 }
@@ -96,6 +96,8 @@ void APartyCharacter::BeginPlay()
 	{
 		OnTakeAnyDamage.AddDynamic(this, &ThisClass::ReceiveDamage);
 	}
+	
+	
 }
 
 void APartyCharacter::Tick(const float DeltaTime)
@@ -136,7 +138,7 @@ ETeam APartyCharacter::GetTeam()
 
 void APartyCharacter::RotateInPlace(float DeltaTime)
 {
-	if (CombatComponent && CombatComponent->bHoldingFlag)
+	if (IsHoldingTheFlag())
 	{
 		bUseControllerRotationYaw = false;
 		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
@@ -219,6 +221,8 @@ void APartyCharacter::PostInitializeComponents()
 			LagCompensationComponent->PartyController = Cast<APartyPlayerController>(Controller);
 		}
 	}
+	
+	CachedPartyPlayerController = Cast<APartyPlayerController>(Controller);
 }
 
 void APartyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -366,7 +370,6 @@ void APartyCharacter::SetSpawnPoint()
 
 void APartyCharacter::UpdateHUDHealth()
 {
-	CachedPartyPlayerController = CachedPartyPlayerController == nullptr ? Cast<APartyPlayerController>(Controller) : CachedPartyPlayerController;
 	if (CachedPartyPlayerController && AttributeSet)
 	{
 		CachedPartyPlayerController->SetHUDHealth(AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
@@ -375,7 +378,6 @@ void APartyCharacter::UpdateHUDHealth()
 
 void APartyCharacter::UpdateHUDShield()
 {
-	CachedPartyPlayerController = CachedPartyPlayerController == nullptr ? Cast<APartyPlayerController>(Controller) : CachedPartyPlayerController;
 	if (CachedPartyPlayerController && AttributeSet)
 	{
 		CachedPartyPlayerController->SetHUDShield(AttributeSet->GetShield(), AttributeSet->GetMaxShield());
@@ -384,7 +386,6 @@ void APartyCharacter::UpdateHUDShield()
 
 void APartyCharacter::UpdateHUDAmmo()
 {
-	CachedPartyPlayerController = CachedPartyPlayerController == nullptr ? Cast<APartyPlayerController>(Controller) : CachedPartyPlayerController;
 	if (CachedPartyPlayerController && CombatComponent && CombatComponent->EquippedWeapon)
 	{
 		CachedPartyPlayerController->SetHUDCarriedAmmo(CombatComponent->CarriedAmmo);
@@ -423,7 +424,7 @@ void APartyCharacter::PlayFireMontage(bool inIsAiming) const
 
 	if (AnimInstance && FireWeaponMontage)
 	{
-		const FName SectionName = inIsAiming ? FName("RifleAim") : FName("RifleHip");
+		const FName SectionName = inIsAiming ? RifleAimSection : RifleHipSection;
 		AnimInstance->Montage_JumpToSection(SectionName);
 		AnimInstance->Montage_Play(FireWeaponMontage);
 	}
@@ -897,7 +898,7 @@ void APartyCharacter::CrouchButtonPressed()
 		return;
 	}
 
-	if (CombatComponent && CombatComponent->bHoldingFlag)
+	if (IsHoldingTheFlag())
 	{
 		return;
 	}
@@ -956,7 +957,7 @@ void APartyCharacter::FireButtonReleased()
 		return;
 	}
 	
-	if (CombatComponent && CombatComponent->bHoldingFlag)
+	if (IsHoldingTheFlag())
 	{
 		return;
 	}
@@ -971,7 +972,7 @@ void APartyCharacter::ReloadButtonPressed()
 		return;
 	}
 	
-	if (CombatComponent && CombatComponent->bHoldingFlag)
+	if (IsHoldingTheFlag())
 	{
 		return;
 	}
@@ -989,7 +990,7 @@ void APartyCharacter::Jump()
 		return;
 	}
 
-	if (CombatComponent && CombatComponent->bHoldingFlag)
+	if (IsHoldingTheFlag())
 	{
 		return;
 	}
@@ -1120,7 +1121,7 @@ void APartyCharacter::ApplyHealthDamageEffect(const float DamageToHealth) const
 		if (SpecHandle.IsValid())
 		{
 			FGameplayEffectSpec* Spec = SpecHandle.Data.Get();
-			Spec->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Damage")), DamageToHealth * (-1));
+			Spec->SetSetByCallerMagnitude(DamageEffectTag, DamageToHealth * (-1));
 
 			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*Spec);
 		}
@@ -1258,7 +1259,7 @@ void APartyCharacter::SetupCollisionBoxes()
 
 	Foot_2Box = CreateDefaultSubobject<UBoxComponent>(TEXT("foot_r"));
 	Foot_2Box->SetupAttachment(GetMesh(), FName("foot_r"));
-	HitCollisionBoxes.Add(FName("foot_r"), HeadBox);
+	HitCollisionBoxes.Add(FName("foot_r"), Foot_2Box);
 
 	for (const auto Box : HitCollisionBoxes)
 	{

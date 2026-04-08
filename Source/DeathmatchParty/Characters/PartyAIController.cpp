@@ -3,14 +3,14 @@
 
 #include "PartyAIController.h"
 
-//#include "Perception/AIPerceptionComponent.h"
-//#include "Perception/AISenseConfig_Damage.h"
-//#include "Perception/AISenseConfig_Hearing.h"
-//#include "Perception/AISenseConfig_Sight.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Damage.h"
+#include "Perception/AISenseConfig_Hearing.h"
+#include "Perception/AISenseConfig_Sight.h"
 
 APartyAIController::APartyAIController()
 {
-/*	AIPerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+	AIPerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 	
 	DamageSenseConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("DamageSenseConfig"));
 	DamageSenseConfig->SetMaxAge(0.5f);
@@ -36,5 +36,5 @@ APartyAIController::APartyAIController()
 
 	AIPerceptionComp->ConfigureSense(*HearingSenseConfig);
 	
-	AIPerceptionComp->SetDominantSense(UAISense_Sight::StaticClass());*/
+	AIPerceptionComp->SetDominantSense(UAISense_Sight::StaticClass());
 }
